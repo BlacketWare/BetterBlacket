@@ -3,8 +3,15 @@ import path from 'path';
 import * as childproc from 'child_process';
 import * as url from 'url';
 
+const getClipboardCommand = (platform) => {
+    if (platform === "darwin") return "pbcopy";
+    else if (platform === "win32") return "clip";
+    // most linux systems have xclip but since its linux its a them problem not having it lol
+    else if (platform === "linux") return "xclip";
+}
+
 const copyToClip = (data) => {
-    let proc = childproc.spawn('pbcopy'); 
+    let proc = childproc.spawn(getClipboardCommand(process.platform)); 
     proc.stdin.write(data);
     proc.stdin.end();
 };

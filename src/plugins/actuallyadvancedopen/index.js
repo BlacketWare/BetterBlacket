@@ -1,10 +1,12 @@
-import axios from 'axios';
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Advanced Opener',
-    description: 'a better way to open packs.',
-    authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
+    title: 'Actually Advanced Opener',
+    description: 'the fastest way to mass open blacket packs.',
+    authors: [
+        { name: 'Syfe', avatar: 'https://i.imgur.com/OKpOipQ.gif', url: 'https://github.com/ItsSyfe' },
+        { name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }
+    ],
     styles: `
         .bb_openModal {
             font-family: "Nunito", sans-serif;
@@ -87,7 +89,7 @@ export default () => createPlugin({
     `,
     onStart: () => {
         if (!location.pathname.startsWith('/market')) return;
-        else console.log('Advanced Opener started!');
+        else console.log('Actually Advanced Opener started!');
 
         bb.plugins.massopen = {};
 
@@ -128,19 +130,19 @@ export default () => createPlugin({
                 buttons: [{ text: 'Close' }]
             });
 
-            let speedModal = new bb.Modal({
+            let extraDelayModal = new bb.Modal({
                 title: 'Mass Open',
-                description: 'note: recommended is around 700',
-                inputs: [{ placeholder: 'Speed' }],
+                description: 'note: you can leave this at zero (nothing) if you\'re not going to be using blacket while running the opener, otherwise recommended is 50-75',
+                inputs: [{ placeholder: 'Extra Delay' }],
                 buttons: [{ text: 'Next' }, { text: 'Cancel' }]
             });
 
-            let speedResponse = await speedModal.listen();
-            if (speedResponse.button !== '0') return;
+            let extraDelayResponse = await extraDelayModal.listen();
+            if (extraDelayResponse.button !== '0') return;
 
-            let speed = Number(speedResponse.inputs[0].value);
-            if (speed === NaN) return new bb.Modal({
-                title: 'Invalid speed.',
+            let extraDelay = Number(extraDelayResponse.inputs[0].value);
+            if (extraDelay === NaN) return new bb.Modal({
+                title: 'Invalid Extra Delay.',
                 buttons: [{ text: 'Close' }]
             });
 
@@ -155,34 +157,51 @@ export default () => createPlugin({
 
             document.querySelector('.bb_openButton').innerText = 'Stop Opening';
 
+            let maxDelay = Object.values(blacket.rarities).map(x => x.wait).reduce((curr, prev) => curr > prev ? curr : prev) + extraDelay;
             let opened = [];
             let openedCount = 0;
 
             let openPack = async () => {
-                await axios.post('/worker3/open', { pack }).then((open) => {
-                    if (open.data.error) return;
-                    opened.push(open.data.blook);
-                    openedCount++;
-                    document.querySelector('.bb_openedCount').innerHTML = `${pack} | ${openedCount}/${qty} opened`;
-                    document.querySelector('.bb_opened').insertAdjacentHTML('beforeend', `<div class="bb_openResult" style="color: ${blacket.rarities[blacket.blooks[open.data.blook].rarity].color};">${open.data.blook}</div>`);
+                return new Promise((resolve, reject) => {
+                    blacket.requests.post("/worker3/open", {
+                        pack
+                    }, (data) => {
+                        if (data.error) reject();
+                        resolve(data.blook);
+                    });
                 });
             };
 
-            let interval = setInterval(() => {
-                if (openedCount < qty) return openPack();
-
-                clearInterval(interval);
-                let count = {};
-                opened.forEach(blook => count[blook] = (count[blook] || 0) + 1);
-                alert(`Final Results:\n` + Object.entries(count).map((x) => `    ${x[1]} ${x[0]}`).join(`\n`));
-
-                document.querySelector('.bb_openedCount').innerHTML = 'Opening ended!';
-                document.querySelector('.bb_openButton').onclick = () => bb.plugins.massopen.start();
-                document.querySelector('.bb_openButton').innerText = 'Start Opening';
-            }, speed);
-
             document.querySelector('.bb_openButton').innerText = 'Stop Opening';
             document.querySelector('.bb_openButton').onclick = () => openedCount = qty;
+
+            while (openedCount < qty) {
+                try {
+                    const attainedBlook = await openPack();
+
+                    blacket.user.tokens -= blacket.packs[pack].price;
+                    $("#tokenBalance").html(`<img loading="lazy" src="/content/tokenIcon.png" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false"><div>${blacket.user.tokens.toLocaleString()}</div>`);
+                    // this value CAN be 50 but if blacket is lagging then you'll fail WAY more often
+                    const delay = blacket.rarities[blacket.blooks[attainedBlook].rarity].wait - 45 + extraDelay;
+                    opened.push(attainedBlook);
+                    openedCount = opened.length;
+
+                    document.querySelector('.bb_openedCount').innerHTML = `${pack} | ${openedCount}/${qty} opened`;
+                    document.querySelector('.bb_opened').insertAdjacentHTML('beforeend', `<div class="bb_openResult" style="color: ${blacket.rarities[blacket.blooks[attainedBlook].rarity].color};">${attainedBlook}</div>`);
+                    await new Promise((r, _) => setTimeout(r, delay));
+                } catch(err) {
+                    console.log(err);
+                    await new Promise((r, _) => setTimeout(r, maxDelay));
+                }
+            }
+
+            let count = {};
+            opened.forEach(blook => count[blook] = (count[blook] || 0) + 1);
+            alert(`Final Results:\n` + Object.entries(count).map((x) => `    ${x[1]} ${x[0]}`).join(`\n`));
+
+            document.querySelector('.bb_openedCount').innerHTML = 'Opening ended!';
+            document.querySelector('.bb_openButton').onclick = () => bb.plugins.massopen.start();
+            document.querySelector('.bb_openButton').innerText = 'Start Opening';
         };
 
         document.body.insertAdjacentHTML('beforeend', `
