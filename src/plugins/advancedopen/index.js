@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Actually Advanced Opener',
+    title: 'Advanced Opener',
     description: 'the fastest way to mass open blacket packs.',
     authors: [
         { name: 'Syfe', avatar: 'https://i.imgur.com/OKpOipQ.gif', url: 'https://github.com/ItsSyfe' },
@@ -89,7 +89,6 @@ export default () => createPlugin({
     `,
     onStart: () => {
         if (!location.pathname.startsWith('/market')) return;
-        else console.log('Actually Advanced Opener started!');
 
         bb.plugins.massopen = {};
 
@@ -132,7 +131,7 @@ export default () => createPlugin({
 
             let extraDelayModal = new bb.Modal({
                 title: 'Mass Open',
-                description: 'note: you can leave this at zero (nothing) if you\'re not going to be using blacket while running the opener, otherwise recommended is 50-75',
+                description: 'you can leave this at zero (nothing) if you\'re not going to be using blacket while running the opener, otherwise recommended is 50-75',
                 inputs: [{ placeholder: 'Extra Delay' }],
                 buttons: [{ text: 'Next' }, { text: 'Cancel' }]
             });
@@ -161,16 +160,12 @@ export default () => createPlugin({
             let opened = [];
             let openedCount = 0;
 
-            let openPack = async () => {
-                return new Promise((resolve, reject) => {
-                    blacket.requests.post("/worker3/open", {
-                        pack
-                    }, (data) => {
-                        if (data.error) reject();
-                        resolve(data.blook);
-                    });
+            let openPack = async () => new Promise((resolve, reject) => {
+                blacket.requests.post('/worker3/open', { pack }, (data) => {
+                    if (data.error) reject();
+                    resolve(data.blook);
                 });
-            };
+            });
 
             document.querySelector('.bb_openButton').innerText = 'Stop Opening';
             document.querySelector('.bb_openButton').onclick = () => openedCount = qty;
@@ -180,7 +175,8 @@ export default () => createPlugin({
                     const attainedBlook = await openPack();
 
                     blacket.user.tokens -= blacket.packs[pack].price;
-                    $("#tokenBalance").html(`<img loading="lazy" src="/content/tokenIcon.png" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false"><div>${blacket.user.tokens.toLocaleString()}</div>`);
+                    $('#tokenBalance').html(`<img loading="lazy" src="/content/tokenIcon.png" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false"><div>${blacket.user.tokens.toLocaleString()}</div>`);
+                    
                     // this value CAN be 50 but if blacket is lagging then you'll fail WAY more often
                     const delay = blacket.rarities[blacket.blooks[attainedBlook].rarity].wait - 45 + extraDelay;
                     opened.push(attainedBlook);
@@ -188,10 +184,10 @@ export default () => createPlugin({
 
                     document.querySelector('.bb_openedCount').innerHTML = `${pack} | ${openedCount}/${qty} opened`;
                     document.querySelector('.bb_opened').insertAdjacentHTML('beforeend', `<div class="bb_openResult" style="color: ${blacket.rarities[blacket.blooks[attainedBlook].rarity].color};">${attainedBlook}</div>`);
-                    await new Promise((r, _) => setTimeout(r, delay));
-                } catch(err) {
+                    await new Promise((r) => setTimeout(r, delay));
+                } catch (err) {
                     console.log(err);
-                    await new Promise((r, _) => setTimeout(r, maxDelay));
+                    await new Promise((r) => setTimeout(r, maxDelay));
                 }
             }
 

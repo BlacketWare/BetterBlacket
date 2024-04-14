@@ -2210,7 +2210,7 @@ const createPlugin = ({
   return plugin;
 };
 const index$f = () => createPlugin({
-  title: "Actually Advanced Opener",
+  title: "Advanced Opener",
   description: "the fastest way to mass open blacket packs.",
   authors: [
     { name: "Syfe", avatar: "https://i.imgur.com/OKpOipQ.gif", url: "https://github.com/ItsSyfe" },
@@ -2299,8 +2299,6 @@ const index$f = () => createPlugin({
   onStart: () => {
     if (!location.pathname.startsWith("/market"))
       return;
-    else
-      console.log("Actually Advanced Opener started!");
     bb.plugins.massopen = {};
     bb.plugins.massopen.start = async () => {
       let packModal = new bb.Modal({
@@ -2339,7 +2337,7 @@ const index$f = () => createPlugin({
         });
       let extraDelayModal = new bb.Modal({
         title: "Mass Open",
-        description: "note: you can leave this at zero (nothing) if you're not going to be using blacket while running the opener, otherwise recommended is 50-75",
+        description: "you can leave this at zero (nothing) if you're not going to be using blacket while running the opener, otherwise recommended is 50-75",
         inputs: [{ placeholder: "Extra Delay" }],
         buttons: [{ text: "Next" }, { text: "Cancel" }]
       });
@@ -2364,17 +2362,13 @@ const index$f = () => createPlugin({
       let maxDelay = Object.values(blacket.rarities).map((x) => x.wait).reduce((curr, prev) => curr > prev ? curr : prev) + extraDelay;
       let opened = [];
       let openedCount = 0;
-      let openPack = async () => {
-        return new Promise((resolve, reject) => {
-          blacket.requests.post("/worker3/open", {
-            pack
-          }, (data) => {
-            if (data.error)
-              reject();
-            resolve(data.blook);
-          });
+      let openPack = async () => new Promise((resolve, reject) => {
+        blacket.requests.post("/worker3/open", { pack }, (data) => {
+          if (data.error)
+            reject();
+          resolve(data.blook);
         });
-      };
+      });
       document.querySelector(".bb_openButton").innerText = "Stop Opening";
       document.querySelector(".bb_openButton").onclick = () => openedCount = qty;
       while (openedCount < qty) {
@@ -2387,10 +2381,10 @@ const index$f = () => createPlugin({
           openedCount = opened.length;
           document.querySelector(".bb_openedCount").innerHTML = `${pack} | ${openedCount}/${qty} opened`;
           document.querySelector(".bb_opened").insertAdjacentHTML("beforeend", `<div class="bb_openResult" style="color: ${blacket.rarities[blacket.blooks[attainedBlook].rarity].color};">${attainedBlook}</div>`);
-          await new Promise((r, _) => setTimeout(r, delay));
+          await new Promise((r) => setTimeout(r, delay));
         } catch (err) {
           console.log(err);
-          await new Promise((r, _) => setTimeout(r, maxDelay));
+          await new Promise((r) => setTimeout(r, maxDelay));
         }
       }
       let count = {};
@@ -4369,7 +4363,7 @@ ${url}`);
 const loadPlugins = async () => {
   let pluginData = storage.get("bb_pluginData", true);
   let contentLoaded = false;
-  await Promise.all(Object.values(/* @__PURE__ */ Object.assign({ "../plugins/actuallyadvancedopen/index.js": __vite_glob_0_0, "../plugins/bazaarsniper/index.js": __vite_glob_0_1, "../plugins/betterchat/index.js": __vite_glob_0_2, "../plugins/betternotifications/index.js": __vite_glob_0_3, "../plugins/blookutils/index.js": __vite_glob_0_4, "../plugins/deafbot/index.js": __vite_glob_0_5, "../plugins/doubleleaderboard/index.js": __vite_glob_0_6, "../plugins/extrastats/index.js": __vite_glob_0_7, "../plugins/highlightrarity/index.js": __vite_glob_0_8, "../plugins/internals/index.js": __vite_glob_0_9, "../plugins/messagelogger/index.js": __vite_glob_0_10, "../plugins/nochatping/index.js": __vite_glob_0_11, "../plugins/nodevtoolswarn/index.js": __vite_glob_0_12, "../plugins/quickcss/index.js": __vite_glob_0_13, "../plugins/realtotalblooks/index.js": __vite_glob_0_14, "../plugins/stafftags/index.js": __vite_glob_0_15 })).map(async (pluginFile) => {
+  await Promise.all(Object.values(/* @__PURE__ */ Object.assign({ "../plugins/advancedopen/index.js": __vite_glob_0_0, "../plugins/bazaarsniper/index.js": __vite_glob_0_1, "../plugins/betterchat/index.js": __vite_glob_0_2, "../plugins/betternotifications/index.js": __vite_glob_0_3, "../plugins/blookutils/index.js": __vite_glob_0_4, "../plugins/deafbot/index.js": __vite_glob_0_5, "../plugins/doubleleaderboard/index.js": __vite_glob_0_6, "../plugins/extrastats/index.js": __vite_glob_0_7, "../plugins/highlightrarity/index.js": __vite_glob_0_8, "../plugins/internals/index.js": __vite_glob_0_9, "../plugins/messagelogger/index.js": __vite_glob_0_10, "../plugins/nochatping/index.js": __vite_glob_0_11, "../plugins/nodevtoolswarn/index.js": __vite_glob_0_12, "../plugins/quickcss/index.js": __vite_glob_0_13, "../plugins/realtotalblooks/index.js": __vite_glob_0_14, "../plugins/stafftags/index.js": __vite_glob_0_15 })).map(async (pluginFile) => {
     let plugin = pluginFile.default();
     bb.plugins.list.push(plugin);
     if (!!plugin.styles)
