@@ -1,8 +1,8 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'No Chat Colors',
-    description: 'disables all colors in chat.',
+    title: 'No Chat Color',
+    description: 'disables color in chat.',
     authors: [{ name: 'Syfe', avatar: 'https://i.imgur.com/OKpOipQ.gif', url: 'https://github.com/ItsSyfe' }],
     patches: [
         {
@@ -11,29 +11,29 @@ export default () => createPlugin({
                 {
                     match: /\$\{data\.author\.color/,
                     replace: `\${"#ffffff"`,
-                    setting: 'No username colors'
+                    setting: 'No Username Colors'
                 },
                 {
                     match: /\$\{blacket\.chat\.cached\.users\[id\]\.color/,
                     replace: `\${"#ffffff"`,
-                    setting: 'No mentioned username colors'
+                    setting: 'No Mention Colors'
                 },
                 {
                     match: /\!data\.author\.permissions\.includes\("use_chat_colors"\)/,
-                    replace: `bb.plugins.settings['No Chat Colors']?.['No message colors'] ?? true`,
-                    setting: 'No message colors'
+                    replace: `bb.plugins.settings['No Chat Color']?.['No Message Colors'] ?? true`,
+                    setting: 'No Message Colors'
                 },
                 {
                     match: /\$\{data\.author\.clan\.color\}/,
                     replace: `\${"#ffffff"}`,
-                    setting: 'No clan colors'
+                    setting: 'No Clan Colors'
                 }
             ]
         }
     ],
     settings: [
         { name: 'No Username Colors', default: true },
-        { name: 'No Mentioned Username Colors', default: true },
+        { name: 'No Mention Colors', default: true },
         { name: 'No Message Colors', default: true },
         { name: 'No Clan Colors', default: true }
     ]

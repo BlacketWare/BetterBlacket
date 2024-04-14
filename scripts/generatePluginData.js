@@ -19,4 +19,4 @@ plugins.sort((a, b) => a.title.localeCompare(b.title));
 
 fs.writeFileSync('./dist/pluginData.json', JSON.stringify(plugins));
 
-console.log('Generated!\n');
+console.log('Plugin list generated & added to dist!\n');

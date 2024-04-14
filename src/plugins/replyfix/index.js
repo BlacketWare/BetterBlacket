@@ -10,11 +10,13 @@ export default () => createPlugin({
             replacement: [
                 {
                     match: /var tem \= document\.querySelector\('\#chatContainer \.styles__chatMessageContainer__G1Z4P\-camelCase\:last\-child'\);/,
-                    replace: `message = message.replace(/&lt;\\/gradient\=.*&gt;/, '');
-                    message = message.replace(/&lt;gradient\=.*&gt;/, '');
-                    message = message.replace(/&lt;\\\/\#.*&gt;/, '');
-                    message = message.replace(/&lt;\#.*&gt;/, '');
-                    var tem = document.querySelector('#chatContainer .styles__chatMessageContainer__G1Z4P-camelCase:last-child');`
+                    replace: `
+                        message = message.replace(/&lt;\\/gradient\=.*&gt;/, '');
+                        message = message.replace(/&lt;gradient\=.*&gt;/, '');
+                        message = message.replace(/&lt;\\\/\#.*&gt;/, '');
+                        message = message.replace(/&lt;\#.*&gt;/, '');
+                        var tem = document.querySelector('#chatContainer .styles__chatMessageContainer__G1Z4P-camelCase:last-child');
+                    `
                 }
             ]
         }
