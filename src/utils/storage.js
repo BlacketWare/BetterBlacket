@@ -19,6 +19,7 @@ class Storage {
     set = (key, value, stringify) => {
         if (stringify) this.storage[key] = JSON.stringify(value);
         else this.storage[key] = value;
+        return this.refresh();
     };
 };
 

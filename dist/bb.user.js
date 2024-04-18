@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BetterBlacket
 // @description  the best client mod for blacket.
-// @version      3.0.6.0
+// @version      3.0.6.1
 // @icon         https://blacket.org/content/logo.png
 
 // @author       Death / VillainsRule
@@ -2160,6 +2160,7 @@ class Storage {
         this.storage[key] = JSON.stringify(value);
       else
         this.storage[key] = value;
+      return this.refresh();
     });
     Object.entries(localStorage).forEach(([key, value]) => this.storage[key] = value);
   }
