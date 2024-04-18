@@ -11,7 +11,7 @@ class Storage {
         return this.storage;
     };
 
-    get = (key, parse)=> {
+    get = (key, parse) => {
         if (parse) return JSON.parse(this.storage[key]);
         return this.storage[key];
     };
@@ -19,21 +19,7 @@ class Storage {
     set = (key, value, stringify) => {
         if (stringify) this.storage[key] = JSON.stringify(value);
         else this.storage[key] = value;
-        return this.refresh();
     };
-
-    remove = (key) => {
-        delete this.storage[key];
-        return this.refresh();
-    };
-
-    clear = () => {
-        this.storage = {};
-        return this.refresh();
-    };
-
-    all = () => this.storage;
 };
 
-const storage = new Storage();
-export default storage;
+export default new Storage();

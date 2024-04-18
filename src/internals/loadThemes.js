@@ -40,7 +40,7 @@ export default async (single) => {
             console.log(`Loaded theme "${meta.name}".`);
             bb.events.dispatch('themeUpdate');
         }).catch((err) => {
-            console.log('Failed to load theme: ' + theme + ' - ', err);
+            console.log('Failed to load theme: ' + theme + ' - ', err.message);
             bb.themes.broken.push({
                 url: theme,
                 reason: 'Theme could not be loaded.'

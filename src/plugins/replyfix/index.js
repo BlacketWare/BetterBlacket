@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Reply Fix',
+    name: 'Reply Fix',
     description: 'fixes blacket\'s broken replies.',
     authors: [{ name: 'Syfe', avatar: 'https://i.imgur.com/OKpOipQ.gif', url: 'https://github.com/ItsSyfe' }],
     patches: [

@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Better Notifications',
+    name: 'Better Notifications',
     description: 'a new and improved notification system.',
     authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
     patches: [

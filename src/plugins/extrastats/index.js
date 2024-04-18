@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Extra Stats',
+    name: 'Extra Stats',
     description: 'gives you extra stats for users.',
     authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
     patches: [

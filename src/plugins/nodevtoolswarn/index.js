@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'No Devtools Warning',
+    name: 'No Devtools Warning',
     description: 'disables the warning in the console.',
     authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
     patches: [

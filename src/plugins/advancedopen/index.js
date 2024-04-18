@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Advanced Opener',
+    name: 'Advanced Opener',
     description: 'the fastest way to mass open blacket packs.',
     authors: [
         { name: 'Syfe', avatar: 'https://i.imgur.com/OKpOipQ.gif', url: 'https://github.com/ItsSyfe' },

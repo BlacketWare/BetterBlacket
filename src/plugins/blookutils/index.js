@@ -2,7 +2,7 @@ import axios from 'axios';
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Blook Utilities',
+    name: 'Blook Utilities',
     description: 'enhances the blook manager experience.',
     authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
     patches: [

@@ -2,7 +2,7 @@ import axios from 'axios';
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Bazaar Sniper',
+    name: 'Bazaar Sniper',
     description: 'pew pew! sniped right off the bazaar!',
     authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
     onStart: () => {

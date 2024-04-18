@@ -2,7 +2,7 @@ import createPlugin from '#utils/createPlugin';
 import commands from './commands/index.js';
 
 export default () => createPlugin({
-    title: 'DeafBot',
+    name: 'DeafBot',
     description: 'the chatbot you know and love.',
     authors: [{ name: 'Death', avatar: 'https://i.imgur.com/PrvNWub.png', url: 'https://villainsrule.xyz' }],
     patches: [

@@ -8,10 +8,12 @@ export default async () => {
 
     await Promise.all(Object.values(import.meta.glob('../@(plugins|userplugins)/*/index.js', { eager: true })).map(async (pluginFile) => {
         let plugin = pluginFile.default();
-
         bb.plugins.list.push(plugin);
-        if (!!plugin.styles) bb.plugins.styles[plugin.title] = plugin.styles;
+        if (!!plugin.styles) bb.plugins.styles[plugin.name] = plugin.styles;
     }));
+
+    bb.plugins.active = [...pluginData.active, ...bb.plugins.list.filter(p => p.required).map(p => p.name)];
+    bb.plugins.settings = pluginData.settings;
 
     console.log(`Detected readyState ${document.readyState}. Running onLoad listeners...`);
 
@@ -20,7 +22,7 @@ export default async () => {
         contentLoaded = true;
 
         bb.plugins.list.forEach((plugin) => {
-            if (pluginData.active.includes(plugin.title) || plugin.required) plugin.onLoad?.();
+            if (pluginData.active.includes(plugin.name) || plugin.required) plugin.onLoad?.();
         });
     });
 
@@ -28,26 +30,29 @@ export default async () => {
         contentLoaded = true;
 
         bb.plugins.list.forEach((plugin) => {
-            if (pluginData.active.includes(plugin.title) || plugin.required) plugin.onLoad?.();
+            if (pluginData.active.includes(plugin.name) || plugin.required) plugin.onLoad?.();
         });
     };
 
     events.subscribe('pageInit', () => {
         console.log(`Plugins got pageInit. Starting plugins...`);
         bb.plugins.list.forEach((plugin) => {
-            if (pluginData.active.includes(plugin.title) || plugin.required) plugin.onStart?.();
+            if (pluginData.active.includes(plugin.name) || plugin.required) plugin.onStart?.();
         });
     });
 
-    bb.plugins.list.forEach(plug => {
-        if (pluginData.active.includes(plug.title) || plug.required) plug.patches.forEach(p => bb.patches.push({
-            ...p,
-            plugin: plug.title
+    bb.plugins.list.forEach((plugin) => {
+        if (pluginData.active.includes(plugin.name) || plugin.required) plugin.patches.forEach((patch) => bb.patches.push({
+            ...patch,
+            plugin: plugin.name
         }));
-    });
 
-    bb.plugins.active = [...pluginData.active, ...bb.plugins.list.filter(p => p.required).map(p => p.title)];
-    bb.plugins.settings = pluginData.settings;
+        if (!bb.plugins.settings[plugin.name]) bb.plugins.settings[plugin.name] = {};
+        
+        plugin.settings.forEach((setting) => {
+            if (!bb.plugins.settings[plugin.name][setting.name]) bb.plugins.settings[plugin.name][setting.name] = setting.default;
+        });
+    });
 
     console.log('Plugin data loaded. Starting patcher...');
     patcher();

@@ -23,16 +23,10 @@ export default () => {
                             let filePatches = bb.patches.filter((e) => src.replace(location.origin, '').startsWith(e.file));
 
                             for (const patch of filePatches) for (const replacement of patch.replacement) {
-                                if (replacement.setting) {
-                                    let settingActive = typeof bb.plugins.settings?.[patch.plugin]?.[replacement.setting] === 'boolean'
-                                        ? bb.plugins.settings?.[patch.plugin]?.[replacement.setting] ? true : false
-                                        : bb.plugins.list.find(p => p.title === patch.plugin).settings.find(s => s.name === replacement.setting) ? true : false;
-
-                                    if (!settingActive) {
-                                        console.log('Setting', replacement.setting, 'is not active, ignoring...');
-                                        continue;
-                                    } else console.log('Setting', replacement.setting, 'is active, applying...');
-                                };
+                                if (replacement.setting && bb.plugins.settings[patch.plugin]?.[replacement.setting] === false) {
+                                    console.log('Setting', replacement.setting, 'is not active, ignoring...');
+                                    continue;
+                                } else if (replacement.setting) console.log('Setting', replacement.setting, 'is active, applying...');
 
                                 const matchRegex = new RegExp(replacement.match, 'gm');
                                 if (!matchRegex.test(data)) {
@@ -74,12 +68,10 @@ export default () => {
 
     /*
         Please do not remove this.
-
+    
         Multiple mods often cause issues, often relating to hidden background scripts conflicting.
         In the case of Blacket++ and some other mods, we both directly modify the code of the game.
         This can cause conflicts and breakage, and neither mod will work.
-
-        Be mindful what you do with our scripts.
     */
 
     setTimeout(() => {
@@ -87,7 +79,7 @@ export default () => {
             'BetterBlacket v2': () => !!(window.pr || window.addCSS),
             'Flybird': () => !!window.gold,
             'Themeify': () => !!document.querySelector('#themifyButton'),
-            'Blacket++': () => !!window.BPP
+            'Blacket++': () => !!(window.BPP || window.bpp)
         };
 
         Object.entries(mods).forEach(mod => (mod[1]()) ? document.body.insertAdjacentHTML('beforeend', `

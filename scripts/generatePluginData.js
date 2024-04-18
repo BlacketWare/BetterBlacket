@@ -7,7 +7,7 @@ await Promise.all([...fs.readdirSync('./src/plugins')].map(async (file) => {
     if (plugin.required || plugin.disabled) return;
 
     plugins.push({
-        title: plugin.title,
+        title: plugin.name,
         description: plugin.description,
         authors: plugin.authors,
         settings: plugin.settings,

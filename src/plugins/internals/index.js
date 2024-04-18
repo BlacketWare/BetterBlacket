@@ -1,7 +1,7 @@
 import createPlugin from '#utils/createPlugin';
 
 export default () => createPlugin({
-    title: 'Internals',
+    name: 'Internals',
     description: 'the internals of BetterBlacket.',
     authors: [{ name: 'Internal' }],
     required: true,
@@ -574,10 +574,10 @@ export default () => createPlugin({
                 ${bb.plugins.list.filter(p => !p.required && !p.disabled).map(p => `
                     <div class="bb_pluginContainer">
                         <div class="bb_pluginHeader">
-                            <div class="bb_pluginTitle">${p.title}</div>
-                            ${p.settings.length ? `<i id="bb_pluginIcon_${p.title.replaceAll(' ', '-')}" class="fas fa-gear bb_pluginIcon" aria-hidden="true"></i>` : `<i id="bb_pluginIcon_${p.title.replaceAll(' ', '-')}" class="far fa-circle-info bb_pluginIcon" aria-hidden="true"></i>`}
+                            <div class="bb_pluginTitle">${p.name}</div>
+                            ${p.settings.length ? `<i id="bb_pluginIcon_${p.name.replaceAll(' ', '-')}" class="fas fa-gear bb_pluginIcon" aria-hidden="true"></i>` : `<i id="bb_pluginIcon_${p.name.replaceAll(' ', '-')}" class="far fa-circle-info bb_pluginIcon" aria-hidden="true"></i>`}
                             <label class="switch">
-                                <input type="checkbox" ${activePlugins.includes(p.title) || p.required ? 'checked' : ''} id="bb_pluginCheckbox_${p.title.replaceAll(' ', '-')}">
+                                <input type="checkbox" ${activePlugins.includes(p.name) || p.required ? 'checked' : ''} id="bb_pluginCheckbox_${p.name.replaceAll(' ', '-')}">
                                 <span class="${p.required ? 'slider bb_requiredPluginSlider' : 'slider'}"></span>
                             </label>
                         </div>
@@ -618,10 +618,10 @@ export default () => createPlugin({
         bb.plugins.list.forEach(p => {
             if (p.required || p.disabled) return;
 
-            document.querySelector(`#bb_pluginCheckbox_${p.title.replaceAll(' ', '-')}`).onchange = (ev) => {
+            document.querySelector(`#bb_pluginCheckbox_${p.name.replaceAll(' ', '-')}`).onchange = (ev) => {
                 if (p.required) return ev.target.checked = true;
 
-                if (!bb.plugins.internals.pendingChanges && (p.patches.length || storedPluginData.active.includes(p.title))) {
+                if (!bb.plugins.pendingChanges && (p.patches.length || storedPluginData.active.includes(p.name))) {
                     const inform = () => blacket.createToast({
                         title: 'Pending Changes',
                         message: 'You have changes in your plugins you have not applied. Reload to apply.',
@@ -629,19 +629,20 @@ export default () => createPlugin({
                     });
                     inform();
                     setInterval(() => inform(), 10000);
+                    bb.plugins.pendingChanges = true;
                 };
 
-                if (storedPluginData.active.includes(p.title)) storedPluginData.active.splice(storedPluginData.active.indexOf(p.title), 1);
-                else storedPluginData.active.push(p.title);
+                if (storedPluginData.active.includes(p.name)) storedPluginData.active.splice(storedPluginData.active.indexOf(p.name), 1);
+                else storedPluginData.active.push(p.name);
 
                 bb.storage.set('bb_pluginData', storedPluginData, true);
             };
 
-            document.querySelector(`#bb_pluginIcon_${p.title.replaceAll(' ', '-')}`).onclick = () => {
+            document.querySelector(`#bb_pluginIcon_${p.name.replaceAll(' ', '-')}`).onclick = () => {
                 document.body.insertAdjacentHTML('beforeend', `
                     <div class="arts__modal___VpEAD-camelCase" id="bigModal">
                         <div class="bb_bigModal">
-                            <div class="bb_bigModalTitle">${p.title}</div>
+                            <div class="bb_bigModalTitle">${p.name}</div>
                             <div class="bb_bigModalDescription">${p.description}</div>
                             <div class="bb_pluginAuthors">${p.authors.map((a) => `<img src="${a.avatar}" onclick="window.open('${a.url}', '_blank')" class="bb_pluginAuthor" />`).join('')}</div>
                             <hr class="bb_bigModalDivider" />
@@ -651,7 +652,7 @@ export default () => createPlugin({
                                     <div class="bb_pluginSetting">
                                         <div class="bb_settingName">${set.name}</div>
                                         <label class="switch">
-                                            <input type="checkbox" ${typeof storedPluginData.settings?.[p.title]?.[set.name] === 'boolean' ? storedPluginData.settings?.[p.title]?.[set.name] ? 'checked' : '' : set.default ? 'checked' : ''} id="bb_settingCheck_${p.title.replaceAll(' ', '-')}_${set.name.replaceAll(' ', '-')}">
+                                            <input type="checkbox" ${typeof storedPluginData.settings?.[p.name]?.[set.name] === 'boolean' ? storedPluginData.settings?.[p.name]?.[set.name] ? 'checked' : '' : set.default ? 'checked' : ''} id="bb_settingCheck_${p.name.replaceAll(' ', '-')}_${set.name.replaceAll(' ', '-')}">
                                             <span class="slider"></span>
                                         </label>
                                     </div>
@@ -668,13 +669,12 @@ export default () => createPlugin({
                 `);
 
                 p.settings.forEach((setting) => {
-                    document.querySelector(`#bb_settingCheck_${p.title.replaceAll(' ', '-')}_${setting.name.replaceAll(' ', '-')}`).onchange = (ev) => {
+                    document.querySelector(`#bb_settingCheck_${p.name.replaceAll(' ', '-')}_${setting.name.replaceAll(' ', '-')}`).onchange = (ev) => {
                         if (!storedPluginData.settings) storedPluginData.settings = {};
-                        if (!storedPluginData.settings[p.title]) storedPluginData.settings[p.title] = {};
-                        storedPluginData.settings[p.title][setting.name] = ev.target.checked;
-                        
-                        if (!bb.plugins.settings[p.title]) bb.plugins.settings[p.title] = {};
-                        bb.plugins.settings[p.title][setting.name] = ev.target.checked;
+                        if (!storedPluginData.settings[p.name]) storedPluginData.settings[p.name] = {};
+                        storedPluginData.settings[p.name][setting.name] = ev.target.checked;
+
+                        bb.plugins.settings[p.name][setting.name] = ev.target.checked;
 
                         bb.storage.set('bb_pluginData', storedPluginData, true);
                     };

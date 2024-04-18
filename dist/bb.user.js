@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BetterBlacket
 // @description  the best client mod for blacket.
-// @version      3.0.5.0
+// @version      3.0.6.0
 // @icon         https://blacket.org/content/logo.png
 
 // @author       Death / VillainsRule
@@ -39,7 +39,7 @@ var __privateAdd = (obj, member, value) => {
     throw TypeError("Cannot add the same private member more than once");
   member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 };
-var __subscriptions;
+var _subscriptions;
 function bind(fn, thisArg) {
   return function wrap() {
     return fn.apply(thisArg, arguments);
@@ -2061,25 +2061,21 @@ axios.default = axios;
 const axios$1 = axios;
 class Events {
   constructor() {
-    __privateAdd(this, __subscriptions, /* @__PURE__ */ new Map());
+    __privateAdd(this, _subscriptions, /* @__PURE__ */ new Map());
     __publicField(this, "subscribe", (event, callback) => {
       console.log(`Subscribed to event '${event}'.`);
-      if (typeof callback !== "function")
-        return console.warn("Events: Event callback must be a function.");
-      if (!__privateGet(this, __subscriptions).has(event))
-        __privateGet(this, __subscriptions).set(event, /* @__PURE__ */ new Set());
-      __privateGet(this, __subscriptions).get(event).add(callback);
+      if (!__privateGet(this, _subscriptions).has(event))
+        __privateGet(this, _subscriptions).set(event, /* @__PURE__ */ new Set());
+      __privateGet(this, _subscriptions).get(event).add(callback);
     });
     __publicField(this, "dispatch", (event, payload) => {
       console.log(`Dispatching event '${event}'.`);
-      if (__privateGet(this, __subscriptions).has(event))
-        __privateGet(this, __subscriptions).get(event).forEach((callback) => callback(payload));
-      else
-        console.warn(`Events: Event '${event}' does not exist.`);
+      if (__privateGet(this, _subscriptions).has(event))
+        __privateGet(this, _subscriptions).get(event).forEach((callback) => callback(payload));
     });
   }
 }
-__subscriptions = new WeakMap();
+_subscriptions = new WeakMap();
 const events = new Events();
 class Modal {
   constructor({
@@ -2164,23 +2160,13 @@ class Storage {
         this.storage[key] = JSON.stringify(value);
       else
         this.storage[key] = value;
-      return this.refresh();
     });
-    __publicField(this, "remove", (key) => {
-      delete this.storage[key];
-      return this.refresh();
-    });
-    __publicField(this, "clear", () => {
-      this.storage = {};
-      return this.refresh();
-    });
-    __publicField(this, "all", () => this.storage);
     Object.entries(localStorage).forEach(([key, value]) => this.storage[key] = value);
   }
 }
 const storage = new Storage();
 const createPlugin = ({
-  title,
+  name,
   description,
   authors,
   patches,
@@ -2191,10 +2177,10 @@ const createPlugin = ({
   required,
   disabled
 }) => {
-  if (!title || !authors?.length || !onLoad && !onStart && !patches && !styles)
+  if (!name || !authors?.length || !onLoad && !onStart && !patches && !styles)
     return console.error(`ERROR: Plugin does not have a title, authors, or executable functions.`);
   let plugin = {
-    title,
+    name,
     description: description || "No description.",
     authors,
     patches: patches || [],
@@ -2210,7 +2196,7 @@ const createPlugin = ({
   return plugin;
 };
 const index$h = () => createPlugin({
-  title: "Advanced Opener",
+  name: "Advanced Opener",
   description: "the fastest way to mass open blacket packs.",
   authors: [
     { name: "Syfe", avatar: "https://i.imgur.com/OKpOipQ.gif", url: "https://github.com/ItsSyfe" },
@@ -2441,7 +2427,7 @@ const index$h = () => createPlugin({
 });
 const __vite_glob_0_0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$h }, Symbol.toStringTag, { value: "Module" }));
 const index$g = () => createPlugin({
-  title: "Bazaar Sniper",
+  name: "Bazaar Sniper",
   description: "pew pew! sniped right off the bazaar!",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   onStart: () => {
@@ -2469,7 +2455,7 @@ Check the console for more information.`);
 });
 const __vite_glob_0_1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$g }, Symbol.toStringTag, { value: "Module" }));
 const index$f = () => createPlugin({
-  title: "Better Chat",
+  name: "Better Chat",
   description: "enhances your chatting experience!",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -2559,7 +2545,7 @@ const index$f = () => createPlugin({
 });
 const __vite_glob_0_2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$f }, Symbol.toStringTag, { value: "Module" }));
 const index$e = () => createPlugin({
-  title: "Better Notifications",
+  name: "Better Notifications",
   description: "a new and improved notification system.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -2647,7 +2633,7 @@ const index$e = () => createPlugin({
 });
 const __vite_glob_0_3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$e }, Symbol.toStringTag, { value: "Module" }));
 const index$d = () => createPlugin({
-  title: "Blook Utilities",
+  name: "Blook Utilities",
   description: "enhances the blook manager experience.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -3197,7 +3183,7 @@ const commands = {
   trade
 };
 const index$c = () => createPlugin({
-  title: "DeafBot",
+  name: "DeafBot",
   description: "the chatbot you know and love.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -3238,7 +3224,7 @@ const index$c = () => createPlugin({
 });
 const __vite_glob_0_5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$c }, Symbol.toStringTag, { value: "Module" }));
 const index$b = () => createPlugin({
-  title: "Double Leaderboard",
+  name: "Double Leaderboard",
   description: "see both leaderboards together.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -3290,7 +3276,7 @@ const index$b = () => createPlugin({
 });
 const __vite_glob_0_6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$b }, Symbol.toStringTag, { value: "Module" }));
 const index$a = () => createPlugin({
-  title: "Extra Stats",
+  name: "Extra Stats",
   description: "gives you extra stats for users.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -3345,7 +3331,7 @@ const index$a = () => createPlugin({
 });
 const __vite_glob_0_7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$a }, Symbol.toStringTag, { value: "Module" }));
 const index$9 = () => createPlugin({
-  title: "Highlight Rarity",
+  name: "Highlight Rarity",
   description: "displays the rarity of Bazaar blooks.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -3366,7 +3352,7 @@ const index$9 = () => createPlugin({
 });
 const __vite_glob_0_8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$9 }, Symbol.toStringTag, { value: "Module" }));
 const index$8 = () => createPlugin({
-  title: "Internals",
+  name: "Internals",
   description: "the internals of BetterBlacket.",
   authors: [{ name: "Internal" }],
   required: true,
@@ -3930,10 +3916,10 @@ const index$8 = () => createPlugin({
                 ${bb.plugins.list.filter((p) => !p.required && !p.disabled).map((p) => `
                     <div class="bb_pluginContainer">
                         <div class="bb_pluginHeader">
-                            <div class="bb_pluginTitle">${p.title}</div>
-                            ${p.settings.length ? `<i id="bb_pluginIcon_${p.title.replaceAll(" ", "-")}" class="fas fa-gear bb_pluginIcon" aria-hidden="true"></i>` : `<i id="bb_pluginIcon_${p.title.replaceAll(" ", "-")}" class="far fa-circle-info bb_pluginIcon" aria-hidden="true"></i>`}
+                            <div class="bb_pluginTitle">${p.name}</div>
+                            ${p.settings.length ? `<i id="bb_pluginIcon_${p.name.replaceAll(" ", "-")}" class="fas fa-gear bb_pluginIcon" aria-hidden="true"></i>` : `<i id="bb_pluginIcon_${p.name.replaceAll(" ", "-")}" class="far fa-circle-info bb_pluginIcon" aria-hidden="true"></i>`}
                             <label class="switch">
-                                <input type="checkbox" ${activePlugins.includes(p.title) || p.required ? "checked" : ""} id="bb_pluginCheckbox_${p.title.replaceAll(" ", "-")}">
+                                <input type="checkbox" ${activePlugins.includes(p.name) || p.required ? "checked" : ""} id="bb_pluginCheckbox_${p.name.replaceAll(" ", "-")}">
                                 <span class="${p.required ? "slider bb_requiredPluginSlider" : "slider"}"></span>
                             </label>
                         </div>
@@ -3969,10 +3955,10 @@ const index$8 = () => createPlugin({
     bb.plugins.list.forEach((p) => {
       if (p.required || p.disabled)
         return;
-      document.querySelector(`#bb_pluginCheckbox_${p.title.replaceAll(" ", "-")}`).onchange = (ev) => {
+      document.querySelector(`#bb_pluginCheckbox_${p.name.replaceAll(" ", "-")}`).onchange = (ev) => {
         if (p.required)
           return ev.target.checked = true;
-        if (!bb.plugins.internals.pendingChanges && (p.patches.length || storedPluginData.active.includes(p.title))) {
+        if (!bb.plugins.pendingChanges && (p.patches.length || storedPluginData.active.includes(p.name))) {
           const inform = () => blacket.createToast({
             title: "Pending Changes",
             message: "You have changes in your plugins you have not applied. Reload to apply.",
@@ -3980,18 +3966,19 @@ const index$8 = () => createPlugin({
           });
           inform();
           setInterval(() => inform(), 1e4);
+          bb.plugins.pendingChanges = true;
         }
-        if (storedPluginData.active.includes(p.title))
-          storedPluginData.active.splice(storedPluginData.active.indexOf(p.title), 1);
+        if (storedPluginData.active.includes(p.name))
+          storedPluginData.active.splice(storedPluginData.active.indexOf(p.name), 1);
         else
-          storedPluginData.active.push(p.title);
+          storedPluginData.active.push(p.name);
         bb.storage.set("bb_pluginData", storedPluginData, true);
       };
-      document.querySelector(`#bb_pluginIcon_${p.title.replaceAll(" ", "-")}`).onclick = () => {
+      document.querySelector(`#bb_pluginIcon_${p.name.replaceAll(" ", "-")}`).onclick = () => {
         document.body.insertAdjacentHTML("beforeend", `
                     <div class="arts__modal___VpEAD-camelCase" id="bigModal">
                         <div class="bb_bigModal">
-                            <div class="bb_bigModalTitle">${p.title}</div>
+                            <div class="bb_bigModalTitle">${p.name}</div>
                             <div class="bb_bigModalDescription">${p.description}</div>
                             <div class="bb_pluginAuthors">${p.authors.map((a) => `<img src="${a.avatar}" onclick="window.open('${a.url}', '_blank')" class="bb_pluginAuthor" />`).join("")}</div>
                             <hr class="bb_bigModalDivider" />
@@ -4001,7 +3988,7 @@ const index$8 = () => createPlugin({
                                     <div class="bb_pluginSetting">
                                         <div class="bb_settingName">${set.name}</div>
                                         <label class="switch">
-                                            <input type="checkbox" ${typeof storedPluginData.settings?.[p.title]?.[set.name] === "boolean" ? storedPluginData.settings?.[p.title]?.[set.name] ? "checked" : "" : set.default ? "checked" : ""} id="bb_settingCheck_${p.title.replaceAll(" ", "-")}_${set.name.replaceAll(" ", "-")}">
+                                            <input type="checkbox" ${typeof storedPluginData.settings?.[p.name]?.[set.name] === "boolean" ? storedPluginData.settings?.[p.name]?.[set.name] ? "checked" : "" : set.default ? "checked" : ""} id="bb_settingCheck_${p.name.replaceAll(" ", "-")}_${set.name.replaceAll(" ", "-")}">
                                             <span class="slider"></span>
                                         </label>
                                     </div>
@@ -4017,15 +4004,13 @@ const index$8 = () => createPlugin({
                     </div>
                 `);
         p.settings.forEach((setting) => {
-          document.querySelector(`#bb_settingCheck_${p.title.replaceAll(" ", "-")}_${setting.name.replaceAll(" ", "-")}`).onchange = (ev) => {
+          document.querySelector(`#bb_settingCheck_${p.name.replaceAll(" ", "-")}_${setting.name.replaceAll(" ", "-")}`).onchange = (ev) => {
             if (!storedPluginData.settings)
               storedPluginData.settings = {};
-            if (!storedPluginData.settings[p.title])
-              storedPluginData.settings[p.title] = {};
-            storedPluginData.settings[p.title][setting.name] = ev.target.checked;
-            if (!bb.plugins.settings[p.title])
-              bb.plugins.settings[p.title] = {};
-            bb.plugins.settings[p.title][setting.name] = ev.target.checked;
+            if (!storedPluginData.settings[p.name])
+              storedPluginData.settings[p.name] = {};
+            storedPluginData.settings[p.name][setting.name] = ev.target.checked;
+            bb.plugins.settings[p.name][setting.name] = ev.target.checked;
             bb.storage.set("bb_pluginData", storedPluginData, true);
           };
         });
@@ -4035,7 +4020,7 @@ const index$8 = () => createPlugin({
 });
 const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$8 }, Symbol.toStringTag, { value: "Module" }));
 const index$7 = () => createPlugin({
-  title: "Message Logger",
+  name: "Message Logger",
   description: "view deleted messages like a staff would.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   disabled: true,
@@ -4053,7 +4038,7 @@ const index$7 = () => createPlugin({
 });
 const __vite_glob_0_10 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$7 }, Symbol.toStringTag, { value: "Module" }));
 const index$6 = () => createPlugin({
-  title: "No Chat Color",
+  name: "No Chat Color",
   description: "disables color in chat.",
   authors: [{ name: "Syfe", avatar: "https://i.imgur.com/OKpOipQ.gif", url: "https://github.com/ItsSyfe" }],
   patches: [
@@ -4092,7 +4077,7 @@ const index$6 = () => createPlugin({
 });
 const __vite_glob_0_11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$6 }, Symbol.toStringTag, { value: "Module" }));
 const index$5 = () => createPlugin({
-  title: "No Chat Ping",
+  name: "No Chat Ping",
   description: "prevents you from being pinged in chat.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -4123,7 +4108,7 @@ const index$5 = () => createPlugin({
 });
 const __vite_glob_0_12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$5 }, Symbol.toStringTag, { value: "Module" }));
 const index$4 = () => createPlugin({
-  title: "No Devtools Warning",
+  name: "No Devtools Warning",
   description: "disables the warning in the console.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -4140,7 +4125,7 @@ const index$4 = () => createPlugin({
 });
 const __vite_glob_0_13 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$4 }, Symbol.toStringTag, { value: "Module" }));
 const index$3 = () => createPlugin({
-  title: "Quick CSS",
+  name: "Quick CSS",
   description: "edit CSS for the game and have it applied instantly.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   styles: `
@@ -4266,7 +4251,7 @@ const index$3 = () => createPlugin({
 });
 const __vite_glob_0_14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$3 }, Symbol.toStringTag, { value: "Module" }));
 const index$2 = () => createPlugin({
-  title: "Real Total blooks",
+  name: "Real Total blooks",
   description: "displays the true number of total blooks on the stats page.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -4283,7 +4268,7 @@ const index$2 = () => createPlugin({
 });
 const __vite_glob_0_15 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$2 }, Symbol.toStringTag, { value: "Module" }));
 const index$1 = () => createPlugin({
-  title: "Reply Fix",
+  name: "Reply Fix",
   description: "fixes blacket's broken replies.",
   authors: [{ name: "Syfe", avatar: "https://i.imgur.com/OKpOipQ.gif", url: "https://github.com/ItsSyfe" }],
   patches: [
@@ -4306,7 +4291,7 @@ const index$1 = () => createPlugin({
 });
 const __vite_glob_0_16 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$1 }, Symbol.toStringTag, { value: "Module" }));
 const index = () => createPlugin({
-  title: "Staff Tags",
+  name: "Staff Tags",
   description: "gives staff who speak in chat a special tag.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
   patches: [
@@ -4359,15 +4344,11 @@ const patcher = () => {
               let filePatches = bb.patches.filter((e) => src.replace(location.origin, "").startsWith(e.file));
               for (const patch of filePatches)
                 for (const replacement of patch.replacement) {
-                  if (replacement.setting) {
-                    let settingActive = typeof bb.plugins.settings?.[patch.plugin]?.[replacement.setting] === "boolean" ? bb.plugins.settings?.[patch.plugin]?.[replacement.setting] ? true : false : bb.plugins.list.find((p) => p.title === patch.plugin).settings.find((s) => s.name === replacement.setting) ? true : false;
-                    if (!settingActive) {
-                      console.log("Setting", replacement.setting, "is not active, ignoring...");
-                      continue;
-                    } else
-                      console.log("Setting", replacement.setting, "is active, applying...");
-                  }
-                  ;
+                  if (replacement.setting && bb.plugins.settings[patch.plugin]?.[replacement.setting] === false) {
+                    console.log("Setting", replacement.setting, "is not active, ignoring...");
+                    continue;
+                  } else if (replacement.setting)
+                    console.log("Setting", replacement.setting, "is active, applying...");
                   const matchRegex = new RegExp(replacement.match, "gm");
                   if (!matchRegex.test(data)) {
                     console.log(`Patch did nothing! Plugin: ${patch.plugin}; Regex: \`${replacement.match}\`.`);
@@ -4410,7 +4391,7 @@ ${url}`);
       "BetterBlacket v2": () => !!(window.pr || window.addCSS),
       "Flybird": () => !!window.gold,
       "Themeify": () => !!document.querySelector("#themifyButton"),
-      "Blacket++": () => !!window.BPP
+      "Blacket++": () => !!(window.BPP || window.bpp)
     };
     Object.entries(mods).forEach((mod) => mod[1]() ? document.body.insertAdjacentHTML("beforeend", `
             <div class="arts__modal___VpEAD-camelCase" id="bigModal">
@@ -4429,41 +4410,47 @@ const loadPlugins = async () => {
     let plugin = pluginFile.default();
     bb.plugins.list.push(plugin);
     if (!!plugin.styles)
-      bb.plugins.styles[plugin.title] = plugin.styles;
+      bb.plugins.styles[plugin.name] = plugin.styles;
   }));
+  bb.plugins.active = [...pluginData.active, ...bb.plugins.list.filter((p) => p.required).map((p) => p.name)];
+  bb.plugins.settings = pluginData.settings;
   console.log(`Detected readyState ${document.readyState}. Running onLoad listeners...`);
   document.addEventListener("DOMContentLoaded", () => {
     if (contentLoaded)
       return;
     contentLoaded = true;
     bb.plugins.list.forEach((plugin) => {
-      if (pluginData.active.includes(plugin.title) || plugin.required)
+      if (pluginData.active.includes(plugin.name) || plugin.required)
         plugin.onLoad?.();
     });
   });
   if (document.readyState !== "loading" && !contentLoaded) {
     contentLoaded = true;
     bb.plugins.list.forEach((plugin) => {
-      if (pluginData.active.includes(plugin.title) || plugin.required)
+      if (pluginData.active.includes(plugin.name) || plugin.required)
         plugin.onLoad?.();
     });
   }
   events.subscribe("pageInit", () => {
     console.log(`Plugins got pageInit. Starting plugins...`);
     bb.plugins.list.forEach((plugin) => {
-      if (pluginData.active.includes(plugin.title) || plugin.required)
+      if (pluginData.active.includes(plugin.name) || plugin.required)
         plugin.onStart?.();
     });
   });
-  bb.plugins.list.forEach((plug) => {
-    if (pluginData.active.includes(plug.title) || plug.required)
-      plug.patches.forEach((p) => bb.patches.push({
-        ...p,
-        plugin: plug.title
+  bb.plugins.list.forEach((plugin) => {
+    if (pluginData.active.includes(plugin.name) || plugin.required)
+      plugin.patches.forEach((patch) => bb.patches.push({
+        ...patch,
+        plugin: plugin.name
       }));
+    if (!bb.plugins.settings[plugin.name])
+      bb.plugins.settings[plugin.name] = {};
+    plugin.settings.forEach((setting) => {
+      if (!bb.plugins.settings[plugin.name][setting.name])
+        bb.plugins.settings[plugin.name][setting.name] = setting.default;
+    });
   });
-  bb.plugins.active = [...pluginData.active, ...bb.plugins.list.filter((p) => p.required).map((p) => p.title)];
-  bb.plugins.settings = pluginData.settings;
   console.log("Plugin data loaded. Starting patcher...");
   patcher();
 };
@@ -4501,7 +4488,7 @@ const loadThemes = async (single) => {
       console.log(`Loaded theme "${meta.name}".`);
       bb.events.dispatch("themeUpdate");
     }).catch((err) => {
-      console.log("Failed to load theme: " + theme + " - ", err);
+      console.log("Failed to load theme: " + theme + " - ", err.message);
       bb.themes.broken.push({
         url: theme,
         reason: "Theme could not be loaded."
@@ -4527,9 +4514,7 @@ window.bb = {
     list: [],
     settings: {},
     styles: {},
-    internals: {
-      pendingChanges: false
-    }
+    pendingChanges: false
   },
   themes: {
     list: [],

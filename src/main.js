@@ -16,9 +16,7 @@ window.bb = {
         list: [],
         settings: {},
         styles: {},
-        internals: {
-            pendingChanges: false
-        }
+        pendingChanges: false
     },
     themes: {
         list: [],

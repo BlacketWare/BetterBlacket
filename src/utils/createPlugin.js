@@ -1,5 +1,5 @@
 export default ({
-    title,
+    name,
     description,
     authors,
     patches,
@@ -10,10 +10,10 @@ export default ({
     required,
     disabled
 }) => {
-    if (!title || !authors?.length || (!onLoad && !onStart && !patches && !styles)) return console.error(`ERROR: Plugin does not have a title, authors, or executable functions.`);
+    if (!name || !authors?.length || (!onLoad && !onStart && !patches && !styles)) return console.error(`ERROR: Plugin does not have a title, authors, or executable functions.`);
     
     let plugin = {
-        title,
+        name,
         description: description || 'No description.',
         authors,
         patches: patches || [],
