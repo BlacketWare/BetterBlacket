@@ -33,7 +33,6 @@ export default () => {
                                     continue;
                                 };
 
-
                                 replacement.replace = replacement.replace.replace('$self', `bb.plugins.list.find(a => a.name === '${patch.plugin}')`);
                                 data = data.replaceAll(matchRegex, replacement.replace);
                             };
