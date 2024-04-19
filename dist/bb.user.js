@@ -4330,101 +4330,17 @@ const index$1 = () => createPlugin({
   ]
 });
 const __vite_glob_0_17 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$1 }, Symbol.toStringTag, { value: "Module" }));
-const patchTypes = ["a", "b", "i"];
-const patchedObjects = /* @__PURE__ */ new Map();
-function hook(funcName, funcParent, funcArgs, ctxt, isConstruct) {
-  const patch = patchedObjects.get(funcParent)?.[funcName];
-  if (!patch)
-    return isConstruct ? Reflect.construct(funcParent[funcName], funcArgs, ctxt) : funcParent[funcName].apply(ctxt, funcArgs);
-  for (const hook2 of patch.b.values()) {
-    const maybefuncArgs = hook2.call(ctxt, funcArgs);
-    if (Array.isArray(maybefuncArgs))
-      funcArgs = maybefuncArgs;
-  }
-  let workingRetVal = [...patch.i.values()].reduce(
-    (prev, current) => (...args) => current.call(ctxt, args, prev),
-    // This calls the original function
-    (...args) => isConstruct ? Reflect.construct(patch.o, args, ctxt) : patch.o.apply(ctxt, args)
-  )(...funcArgs);
-  for (const hook2 of patch.a.values())
-    workingRetVal = hook2.call(ctxt, funcArgs, workingRetVal) ?? workingRetVal;
-  return workingRetVal;
-}
-function unpatch(funcParent, funcName, hookId, type) {
-  const patchedObject = patchedObjects.get(funcParent);
-  const patch = patchedObject?.[funcName];
-  if (!patch?.[type].has(hookId))
-    return false;
-  patch[type].delete(hookId);
-  if (patchTypes.every((t) => patch[t].size === 0)) {
-    const success = Reflect.defineProperty(funcParent, funcName, {
-      value: patch.o,
-      writable: true,
-      configurable: true
-    });
-    if (!success)
-      funcParent[funcName] = patch.o;
-    delete patchedObject[funcName];
-  }
-  if (Object.keys(patchedObject).length == 0)
-    patchedObjects.delete(funcParent);
-  return true;
-}
-const getPatchFunc = (patchType) => (funcName, funcParent, callback, oneTime = false) => {
-  if (typeof funcParent[funcName] !== "function")
-    throw new Error(`${funcName} is not a function in ${funcParent.constructor.name}`);
-  if (!patchedObjects.has(funcParent))
-    patchedObjects.set(funcParent, /* @__PURE__ */ Object.create(null));
-  const parentInjections = patchedObjects.get(funcParent);
-  if (!parentInjections[funcName]) {
-    const origFunc = funcParent[funcName];
-    parentInjections[funcName] = {
-      o: origFunc,
-      b: /* @__PURE__ */ new Map(),
-      i: /* @__PURE__ */ new Map(),
-      a: /* @__PURE__ */ new Map()
-    };
-    const runHook = (ctxt, args, construct) => {
-      const ret = hook(funcName, funcParent, args, ctxt, construct);
-      if (oneTime)
-        unpatchThisPatch();
-      return ret;
-    };
-    const replaceProxy = new Proxy(origFunc, {
-      apply: (_, ctxt, args) => runHook(ctxt, args, false),
-      construct: (_, args) => runHook(origFunc, args, true),
-      get: (target, prop, receiver) => prop == "toString" ? origFunc.toString.bind(origFunc) : Reflect.get(target, prop, receiver)
-    });
-    const success = Reflect.defineProperty(funcParent, funcName, {
-      value: replaceProxy,
-      configurable: true,
-      writable: true
-    });
-    if (!success)
-      funcParent[funcName] = replaceProxy;
-  }
-  const hookId = Symbol();
-  const unpatchThisPatch = () => unpatch(funcParent, funcName, hookId, patchType);
-  parentInjections[funcName][patchType].set(hookId, callback);
-  return unpatchThisPatch;
-};
-const instead = getPatchFunc("i");
 const index = () => createPlugin({
   name: "Faster",
   description: "Attempt to make blacket run faster.",
-  authors: [{ name: "zastix", avatar: "https://zastix.club/resources/pfps/pfp_crop.png", url: "https://zastix.club" }],
+  authors: [{ name: "zastix", avatar: "https://zastix.club/resources/pfps/pfp_crop.png", url: "https://zastix.club/" }],
   patches: [
     {
       file: "/lib/js/game.js",
       replacement: [
         {
-          match: /blacket.\getMessages = async \(room, limit\)/,
-          replace: `blacket.getMessages = async (room, limit, real = false)`,
-          setting: "No Load Chat"
-        },
-        {
-          match: /blacket\.getMessages\(blacket\.chat\.room, 250\);/,
-          replace: `$self.hookChat();blacket.getMessages(blacket.chat.room, 250);`,
+          match: /blacket.\getMessages = async \(room, limit\) => {/,
+          replace: `blacket.getMessages = async (room, limit, real = false) => {if (bb.plugins.settings['Faster']['No Load Chat'] && !real) return;`,
           setting: "No Load Chat"
         },
         {
@@ -4443,8 +4359,7 @@ const index = () => createPlugin({
       replacement: [
         {
           match: /blacket\.requests\.get\(\"\/data\/index\.json\"/,
-          replace: `$self.hookRequests();
-blacket.requests.get("/data/index.json"`,
+          replace: `$self.loadData("/data/index.json"`,
           setting: "Cache Assests"
         }
       ]
@@ -4462,13 +4377,11 @@ blacket.requests.get("/data/index.json"`,
           replace: `true`,
           setting: "No Clan On Stats"
         }
-        // {
-        //     match: /
-        // }
       ]
     }
   ],
   settings: [
+    // alot of these can be named better but death refuses to add plugin descriptions 
     {
       name: "No Friends",
       default: true
@@ -4486,27 +4399,17 @@ blacket.requests.get("/data/index.json"`,
       default: true
     }
   ],
-  hookRequests() {
-    instead("get", blacket.requests, (args, oFunc) => {
-      if (args[0] === "/data/index.json" && bb.plugins.settings["Faster"]["Cache Assests"]) {
-        if (bb.storage.get("faster_assets"))
-          return args[1]?.(JSON.parse(bb.storage.get("faster_assets")));
-        else
-          return oFunc?.(args[0], (data) => {
-            bb.storage.set("faster_assets", JSON.stringify(data));
-            args[1]?.(data);
-          });
-      } else
-        return oFunc?.(...args);
-    });
-  },
-  hookChat() {
-    instead("getMessages", blacket, (args, oFunc) => {
-      if (bb.plugins.settings["Faster"]["No Load Chat"] && !args[2])
-        return;
+  loadData(...args) {
+    if (bb.plugins.settings["Faster"]["Cache Assests"]) {
+      if (bb.storage.get("faster_assets"))
+        return args[1]?.(JSON.parse(bb.storage.get("faster_assets")));
       else
-        return oFunc?.(...args);
-    });
+        return blacket.requests.get(args[0], (data) => {
+          bb.storage.set("faster_assets", JSON.stringify(data));
+          args[1]?.(data);
+        });
+    } else
+      return blacket.requests.get(...args);
   },
   initedChat: false
 });

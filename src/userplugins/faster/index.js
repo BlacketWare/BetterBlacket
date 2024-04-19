@@ -10,7 +10,7 @@ export default () => createPlugin({
             file: '/lib/js/game.js',
             replacement: [
                 {
-                    match: /blacket.\getMessages = async \(room, limit\)/,
+                    match: /blacket.\getMessages = async \(room, limit\) => {/,
                     replace: `blacket.getMessages = async (room, limit, real = false) => {if (bb.plugins.settings['Faster']['No Load Chat'] && !real) return;`,
                     setting: 'No Load Chat'
                 },
@@ -30,7 +30,7 @@ export default () => createPlugin({
             replacement: [
                 {
                     match: /blacket\.requests\.get\(\"\/data\/index\.json\"/,
-                    replace: `$self.hookRequests();\nblacket.requests.get(\"/data/index.json\"`,
+                    replace: `$self.loadData(\"/data/index.json\"`,
                     setting: 'Cache Assests'
                 },
             ]
@@ -70,16 +70,19 @@ export default () => createPlugin({
             default: true
         }
     ],
-    hookRequests() {
-        instead("get", blacket.requests, (args, oFunc) => {
-            if (args[0] === '/data/index.json' && bb.plugins.settings['Faster']['Cache Assests']) {
-                if (bb.storage.get('faster_assets')) return args[1]?.(JSON.parse(bb.storage.get('faster_assets')));
-                else return oFunc?.(args[0], (data) => {
-                    bb.storage.set('faster_assets', JSON.stringify(data));
-                    args[1]?.(data);
-                });
-            } else return oFunc?.(...args);
-        });
+    loadData(...args) {
+        if (bb.plugins.settings['Faster']['Cache Assests']) {
+            const fasterAssets = JSON.parse(bb.storage.get('faster_assets'));
+            if (fasterAssets && (Date.now() - fasterAssets.time) < (24 * 60 * 60 * 1000))
+                return args[1]?.(fasterAssets.data);
+            else return blacket.requests.get(args[0], (data) => {
+                bb.storage.set('faster_assets', JSON.stringify({
+                    time: Date.now(),
+                    data
+                }));
+                args[1]?.(data);
+            });
+        } else return blacket.requests.get(...args);
     },
     initedChat: false
 });
