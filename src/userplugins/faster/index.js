@@ -1,0 +1,96 @@
+import createPlugin from '#utils/createPlugin';
+import { instead } from 'spitroast';
+
+export default () => createPlugin({
+    name: 'Faster',
+    description: 'Attempt to make blacket run faster.',
+    authors: [{ name: 'zastix', avatar: 'https://zastix.club/resources/pfps/pfp_crop.png', url: 'https://zastix.club' }],
+    patches: [
+        {
+            file: '/lib/js/game.js',
+            replacement: [
+                {
+                    match: /blacket.\getMessages = async \(room, limit\)/,
+                    replace: `blacket.getMessages = async (room, limit, real = false)`,
+                    setting: 'No Load Chat'
+                },
+                {
+                    match: /blacket\.getMessages\(blacket\.chat\.room, 250\);/,
+                    replace: `$self.hookChat();blacket.getMessages(blacket.chat.room, 250);`,
+                    setting: 'No Load Chat'
+                },
+                {
+                    match: /blacket.\getMessages\(id, 250\);/,
+                    replace: `blacket.getMessages(id, 250, true);`,
+                    setting: 'No Load Chat'
+                },
+                {
+                    match: /blacket.toggleChat = \(\) => {/,
+                    replace: 'blacket.toggleChat = () => {if (!$self.initedChat) blacket.getMessages(blacket.chat.room, 125, true),$self.initedChat = true;',
+                }
+            ]
+        },
+        {
+            file: '/lib/js/all.js',
+            replacement: [
+                {
+                    match: /blacket\.requests\.get\(\"\/data\/index\.json\"/,
+                    replace: `$self.hookRequests();\nblacket.requests.get(\"/data/index.json\"`,
+                    setting: 'Cache Assests'
+                },
+            ]
+        },
+        {
+            file: '/lib/js/stats.js',
+            replacement: [
+                {
+                    match: /Object\.keys\(blacket.friends.friends\)/,
+                    replace: `[]`,
+                    setting: 'No Friends'
+                },
+                {
+                    match: /user\.clan == null/,
+                    replace: `true`,
+                    setting: 'No Clan On Stats'
+                },
+            ]
+        }
+    ],
+    settings: [
+        // alot of these can be named better but death refuses to add plugin descriptions 
+        {
+            name: 'No Friends',
+            default: true
+        },
+        {
+            name: 'No Clan On Stats',
+            default: true
+        },
+        {
+            name: 'Cache Assests',
+            default: true
+        },
+        {
+            name: 'No Load Chat',
+            default: true
+        }
+    ],
+    hookRequests() {
+        instead("get", blacket.requests, (args, oFunc) => {
+            if (args[0] === '/data/index.json' && bb.plugins.settings['Faster']['Cache Assests']) {
+                if (bb.storage.get('faster_assets')) return args[1]?.(JSON.parse(bb.storage.get('faster_assets')));
+                else return oFunc?.(args[0], (data) => {
+                    bb.storage.set('faster_assets', JSON.stringify(data));
+                    args[1]?.(data);
+                });
+            } else return oFunc?.(...args);
+        });
+    },
+    hookChat() {
+        instead("getMessages", blacket, (args, oFunc) => {
+            if (bb.plugins.settings['Faster']['No Load Chat'] && !args[2]) return;
+            else return oFunc?.(...args);
+        });
+    },
+    initedChat: false
+});

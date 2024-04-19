@@ -4434,7 +4434,7 @@ const index = () => createPlugin({
         },
         {
           match: /blacket.toggleChat = \(\) => {/,
-          replace: "blacket.toggleChat = () => {if (!$self.initedChat) blacket.getMessages(blacket.chat.room, 250),$self.initedChat = true;"
+          replace: "blacket.toggleChat = () => {if (!$self.initedChat) blacket.getMessages(blacket.chat.room, 125, true),$self.initedChat = true;"
         }
       ]
     },
@@ -4539,7 +4539,7 @@ const patcher = () => {
                     continue;
                   }
                   ;
-                  data = data.replaceAll(matchRegex, replacement.replace.replace("$self", `bb.plugins.list.find(a => a.name === '${patch.plugin}')`));
+                  data = data.replaceAll(matchRegex, replacement.replace.replaceAll("$self", `bb.plugins.list.find(a => a.name === '${patch.plugin}')`));
                 }
               ;
               const url = URL.createObjectURL(new Blob([
