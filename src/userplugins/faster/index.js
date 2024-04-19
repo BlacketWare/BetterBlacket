@@ -4,19 +4,14 @@ import { instead } from 'spitroast';
 export default () => createPlugin({
     name: 'Faster',
     description: 'Attempt to make blacket run faster.',
-    authors: [{ name: 'zastix', avatar: 'https://zastix.club/resources/pfps/pfp_crop.png', url: 'https://zastix.club' }],
+    authors: [{ name: 'zastix', avatar: 'https://zastix.club/resources/pfps/pfp_crop.png', url: 'https://zastix.club/' }],
     patches: [
         {
             file: '/lib/js/game.js',
             replacement: [
                 {
                     match: /blacket.\getMessages = async \(room, limit\)/,
-                    replace: `blacket.getMessages = async (room, limit, real = false)`,
-                    setting: 'No Load Chat'
-                },
-                {
-                    match: /blacket\.getMessages\(blacket\.chat\.room, 250\);/,
-                    replace: `$self.hookChat();blacket.getMessages(blacket.chat.room, 250);`,
+                    replace: `blacket.getMessages = async (room, limit, real = false) => {if (bb.plugins.settings['Faster']['No Load Chat'] && !real) return;`,
                     setting: 'No Load Chat'
                 },
                 {
@@ -84,12 +79,6 @@ export default () => createPlugin({
                     args[1]?.(data);
                 });
             } else return oFunc?.(...args);
-        });
-    },
-    hookChat() {
-        instead("getMessages", blacket, (args, oFunc) => {
-            if (bb.plugins.settings['Faster']['No Load Chat'] && !args[2]) return;
-            else return oFunc?.(...args);
         });
     },
     initedChat: false
