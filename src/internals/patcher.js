@@ -34,7 +34,7 @@ export default () => {
                                     continue;
                                 };
 
-                                data = data.replaceAll(matchRegex, replacement.replace);
+                                data = data.replaceAll(matchRegex, replacement.replace.replace('$self', `bb.plugins.list.find(a => a.name === '${patch.plugin}')`));
                             };
 
                             const url = URL.createObjectURL(new Blob([
