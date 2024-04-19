@@ -4,7 +4,6 @@ import * as childproc from 'child_process';
 import * as url from 'url';
 
 const copyToClip = (data) => {
-    return;
     let proc = childproc.spawn({
         'darwin': 'pbcopy',
         'win32': 'clip',
