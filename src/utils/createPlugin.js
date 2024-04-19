@@ -8,7 +8,8 @@ export default ({
     onLoad,
     onStart,
     required,
-    disabled
+    disabled,
+    ...custom
 }) => {
     if (!name || !authors?.length || (!onLoad && !onStart && !patches && !styles)) return console.error(`ERROR: Plugin does not have a title, authors, or executable functions.`);
     
@@ -22,7 +23,8 @@ export default ({
         onLoad: onLoad || (() => { }),
         onStart: onStart || (() => { }),
         required: required || false,
-        disabled: disabled || false
+        disabled: disabled || false,
+        ...custom
     };
 
     return plugin;
