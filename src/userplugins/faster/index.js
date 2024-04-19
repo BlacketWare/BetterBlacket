@@ -1,5 +1,4 @@
 import createPlugin from '#utils/createPlugin';
-import { instead } from 'spitroast';
 
 export default () => createPlugin({
     name: 'Faster',
