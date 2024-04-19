@@ -48,6 +48,16 @@ export default () => createPlugin({
                     setting: 'No Clan On Stats'
                 },
             ]
+        },
+        {
+            file: '/lib/js/blooks.js',
+            replacement: [
+                {
+                    match: /\${locked\.class}"><img loading="lazy" src="\${blacket.blooks\[blook\[1\]\]\.image}"/,
+                    replace: `\${locked.class}"><img loading="lazy" src="\${locked.class ? "/content/blooks/Default.png" : blacket.blooks[blook[1]].image}" `,
+                    setting: 'No Render Unowned Blooks'
+                },
+            ]
         }
     ],
     settings: [
@@ -66,6 +76,10 @@ export default () => createPlugin({
         },
         {
             name: 'No Load Chat',
+            default: true
+        },
+        {
+            name: "No Render Unowned Blooks",
             default: true
         }
     ],
