@@ -27,14 +27,14 @@ export default () => {
                                     console.log('Setting', replacement.setting, 'is not active, ignoring...');
                                     continue;
                                 } else if (replacement.setting) console.log('Setting', replacement.setting, 'is active, applying...');
+
                                 const matchRegex = new RegExp(replacement.match, 'gm');
                                 if (!matchRegex.test(data)) {
                                     console.log(`Patch did nothing! Plugin: ${patch.plugin}; Regex: \`${replacement.match}\`.`);
                                     continue;
                                 };
 
-                                replacement.replace = replacement.replace.replace('$self', `bb.plugins.list.find(a => a.name === '${patch.plugin}')`);
-                                data = data.replaceAll(matchRegex, replacement.replace);
+                                data = data.replaceAll(matchRegex, replacement.replace.replace('$self', `bb.plugins.list.find(a => a.name === '${patch.plugin}')`));
                             };
 
                             const url = URL.createObjectURL(new Blob([
