@@ -1,16 +1,20 @@
 {
-  "name": "betterblacket",
-  "type": "module",
-  "scripts": {
-    "build": "vite build && node userscript/build.js && node scripts/generatePluginData.js"
-  },
-  "dependencies": {
-    "axios": "^1.6.8"
-  },
-  "devDependencies": {
-    "vite": "^5.2.8"
-  },
-  "imports": {
-    "#utils/*": "./src/utils/*.js"
-  }
+    "name": "betterblacket",
+    "type": "module",
+
+    "scripts": {
+        "build": "vite build && node userscript/build.js && node scripts/generatePluginData.js"
+    },
+
+    "dependencies": {
+        "axios": "^1.6.8"
+    },
+
+    "devDependencies": {
+        "vite": "^5.2.8"
+    },
+
+    "imports": {
+        "#utils/*": "./src/utils/*.js"
+    }
 }
