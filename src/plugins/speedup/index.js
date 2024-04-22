@@ -84,7 +84,7 @@ export default () => createPlugin({
     ],
     loadData(...args) {
         if (bb.plugins.settings['Faster']?.['Cache Assests']) {
-            const fasterAssets = JSON.parse(bb.storage.get('bb_fasterAssets'));
+            let fasterAssets = bb.storage.get('bb_fasterAssets', true, {});
             if (fasterAssets && (Date.now() - fasterAssets.time) < (24 * 60 * 60 * 1000))
                 return args[1]?.(fasterAssets.data);
             else return blacket.requests.get(args[0], (data) => {

@@ -11,7 +11,8 @@ class Storage {
         return this.storage;
     };
 
-    get = (key, parse) => {
+    get = (key, parse, fallback = null) => {
+        if (!this.storage[key]) return fallback;
         if (parse) return JSON.parse(this.storage[key]);
         return this.storage[key];
     };

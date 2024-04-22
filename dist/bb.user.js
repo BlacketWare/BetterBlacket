@@ -2144,7 +2144,9 @@ class Storage {
       Object.entries(this.storage).forEach(([key, value]) => localStorage.setItem(key, value));
       return this.storage;
     });
-    __publicField(this, "get", (key, parse) => {
+    __publicField(this, "get", (key, parse, fallback = null) => {
+      if (!this.storage[key])
+        return fallback;
       if (parse)
         return JSON.parse(this.storage[key]);
       return this.storage[key];
@@ -4371,12 +4373,12 @@ const index$1 = () => createPlugin({
   ],
   loadData(...args) {
     if (bb.plugins.settings["Faster"]?.["Cache Assests"]) {
-      const fasterAssets = JSON.parse(bb.storage.get("faster_assets"));
+      let fasterAssets = bb.storage.get("bb_fasterAssets", true, {});
       if (fasterAssets && Date.now() - fasterAssets.time < 24 * 60 * 60 * 1e3)
         return args[1]?.(fasterAssets.data);
       else
         return blacket.requests.get(args[0], (data) => {
-          bb.storage.set("faster_assets", JSON.stringify({
+          bb.storage.set("bb_fasterAssets", JSON.stringify({
             time: Date.now(),
             data
           }));
