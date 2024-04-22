@@ -4373,7 +4373,7 @@ const index$1 = () => createPlugin({
   ],
   loadData(...args) {
     if (bb.plugins.settings["Faster"]?.["Cache Assests"]) {
-      let fasterAssets = bb.storage.get("bb_fasterAssets", true, {});
+      let fasterAssets = bb.storage.get("bb_fasterAssets", true);
       if (fasterAssets && Date.now() - fasterAssets.time < 24 * 60 * 60 * 1e3)
         return args[1]?.(fasterAssets.data);
       else
