@@ -176,7 +176,7 @@ export default () => createPlugin({
 
                     blacket.user.tokens -= blacket.packs[pack].price;
                     $('#tokenBalance').html(`<img loading="lazy" src="/content/tokenIcon.png" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false"><div>${blacket.user.tokens.toLocaleString()}</div>`);
-                    
+
                     // this value CAN be 50 but if blacket is lagging then you'll fail WAY more often
                     const delay = blacket.rarities[blacket.blooks[attainedBlook].rarity].wait - 45 + extraDelay;
                     opened.push(attainedBlook);

@@ -8,7 +8,7 @@ export default async (...args) => {
                 else bb.plugins.deafbot.send(`**${f.data.blocks.length}** blocks: ${f.data.blocks.map(f => f.username).join(', ')}`);
             });
             break;
-        
+
         case 'add':
             if (!args[1]) return bb.plugins.deafbot.send(`Whoa - you want to block yourself or something? Tell me who to block!`);
 

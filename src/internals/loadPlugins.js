@@ -48,7 +48,7 @@ export default async () => {
         }));
 
         if (!bb.plugins.settings[plugin.name]) bb.plugins.settings[plugin.name] = {};
-        
+
         plugin.settings.forEach((setting) => {
             if (!bb.plugins.settings[plugin.name][setting.name]) bb.plugins.settings[plugin.name][setting.name] = setting.default;
         });

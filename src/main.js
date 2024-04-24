@@ -29,4 +29,7 @@ window.bb = {
 console.log('Defined global "bb" variable:', bb, 'Calling loadThemes()...');
 
 import loadThemes from 'internals/loadThemes.js';
-loadThemes();
+import loadPlugins from './internals/loadPlugins';
+
+setTimeout(() => loadThemes(), 0);
+setTimeout(() => loadPlugins(), 0);

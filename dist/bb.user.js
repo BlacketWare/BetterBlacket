@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BetterBlacket
 // @description  the best client mod for blacket.
-// @version      3.0.6.1
+// @version      3.0.7.0
 // @icon         https://blacket.org/content/logo.png
 
 // @author       Death / VillainsRule
@@ -802,7 +802,7 @@ function stringifySafely(rawValue, parser, encoder) {
       }
     }
   }
-  return (0, JSON.stringify)(rawValue);
+  return (encoder || JSON.stringify)(rawValue);
 }
 const defaults = {
   transitional: transitionalDefaults,
@@ -894,6 +894,7 @@ const defaults = {
 utils$1.forEach(["delete", "get", "head", "post", "put", "patch"], (method) => {
   defaults.headers[method] = {};
 });
+const defaults$1 = defaults;
 const ignoreDuplicateOf = utils$1.toObjectSet([
   "age",
   "authorization",
@@ -1152,10 +1153,11 @@ utils$1.reduceDescriptors(AxiosHeaders.prototype, ({ value }, key) => {
   };
 });
 utils$1.freezeMethods(AxiosHeaders);
+const AxiosHeaders$1 = AxiosHeaders;
 function transformData(fns, response) {
-  const config = this || defaults;
+  const config = this || defaults$1;
   const context = response || config;
-  const headers = AxiosHeaders.from(context.headers);
+  const headers = AxiosHeaders$1.from(context.headers);
   let data = context.data;
   utils$1.forEach(fns, function transform(fn) {
     data = fn.call(config, data, headers.normalize(), response ? response.status : void 0);
@@ -1333,7 +1335,7 @@ const isXHRAdapterSupported = typeof XMLHttpRequest !== "undefined";
 const xhrAdapter = isXHRAdapterSupported && function(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
     let requestData = config.data;
-    const requestHeaders = AxiosHeaders.from(config.headers).normalize();
+    const requestHeaders = AxiosHeaders$1.from(config.headers).normalize();
     let { responseType, withXSRFToken } = config;
     let onCanceled;
     function done() {
@@ -1366,7 +1368,7 @@ const xhrAdapter = isXHRAdapterSupported && function(config) {
       if (!request) {
         return;
       }
-      const responseHeaders = AxiosHeaders.from(
+      const responseHeaders = AxiosHeaders$1.from(
         "getAllResponseHeaders" in request && request.getAllResponseHeaders()
       );
       const responseData = !responseType || responseType === "text" || responseType === "json" ? request.responseText : request.response;
@@ -1535,7 +1537,7 @@ function throwIfCancellationRequested(config) {
 }
 function dispatchRequest(config) {
   throwIfCancellationRequested(config);
-  config.headers = AxiosHeaders.from(config.headers);
+  config.headers = AxiosHeaders$1.from(config.headers);
   config.data = transformData.call(
     config,
     config.transformRequest
@@ -1543,7 +1545,7 @@ function dispatchRequest(config) {
   if (["post", "put", "patch"].indexOf(config.method) !== -1) {
     config.headers.setContentType("application/x-www-form-urlencoded", false);
   }
-  const adapter = adapters.getAdapter(config.adapter || defaults.adapter);
+  const adapter = adapters.getAdapter(config.adapter || defaults$1.adapter);
   return adapter(config).then(function onAdapterResolution(response) {
     throwIfCancellationRequested(config);
     response.data = transformData.call(
@@ -1551,7 +1553,7 @@ function dispatchRequest(config) {
       config.transformResponse,
       response
     );
-    response.headers = AxiosHeaders.from(response.headers);
+    response.headers = AxiosHeaders$1.from(response.headers);
     return response;
   }, function onAdapterRejection(reason) {
     if (!isCancel(reason)) {
@@ -1562,13 +1564,13 @@ function dispatchRequest(config) {
           config.transformResponse,
           reason.response
         );
-        reason.response.headers = AxiosHeaders.from(reason.response.headers);
+        reason.response.headers = AxiosHeaders$1.from(reason.response.headers);
       }
     }
     return Promise.reject(reason);
   });
 }
-const headersToObject = (thing) => thing instanceof AxiosHeaders ? { ...thing } : thing;
+const headersToObject = (thing) => thing instanceof AxiosHeaders$1 ? { ...thing } : thing;
 function mergeConfig(config1, config2) {
   config2 = config2 || {};
   const config = {};
@@ -1776,7 +1778,7 @@ class Axios {
         delete headers[method];
       }
     );
-    config.headers = AxiosHeaders.concat(contextHeaders, headers);
+    config.headers = AxiosHeaders$1.concat(contextHeaders, headers);
     const requestInterceptorChain = [];
     let synchronousRequestInterceptors = true;
     this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
@@ -1860,6 +1862,7 @@ utils$1.forEach(["post", "put", "patch"], function forEachMethodWithData(method)
   Axios.prototype[method] = generateHTTPMethod();
   Axios.prototype[method + "Form"] = generateHTTPMethod(true);
 });
+const Axios$1 = Axios;
 class CancelToken {
   constructor(executor) {
     if (typeof executor !== "function") {
@@ -1947,6 +1950,7 @@ class CancelToken {
     };
   }
 }
+const CancelToken$1 = CancelToken;
 function spread(callback) {
   return function wrap(arr) {
     return callback.apply(null, arr);
@@ -2023,20 +2027,21 @@ const HttpStatusCode = {
 Object.entries(HttpStatusCode).forEach(([key, value]) => {
   HttpStatusCode[value] = key;
 });
+const HttpStatusCode$1 = HttpStatusCode;
 function createInstance(defaultConfig) {
-  const context = new Axios(defaultConfig);
-  const instance = bind(Axios.prototype.request, context);
-  utils$1.extend(instance, Axios.prototype, context, { allOwnKeys: true });
+  const context = new Axios$1(defaultConfig);
+  const instance = bind(Axios$1.prototype.request, context);
+  utils$1.extend(instance, Axios$1.prototype, context, { allOwnKeys: true });
   utils$1.extend(instance, context, null, { allOwnKeys: true });
   instance.create = function create(instanceConfig) {
     return createInstance(mergeConfig(defaultConfig, instanceConfig));
   };
   return instance;
 }
-const axios = createInstance(defaults);
-axios.Axios = Axios;
+const axios = createInstance(defaults$1);
+axios.Axios = Axios$1;
 axios.CanceledError = CanceledError;
-axios.CancelToken = CancelToken;
+axios.CancelToken = CancelToken$1;
 axios.isCancel = isCancel;
 axios.VERSION = VERSION;
 axios.toFormData = toFormData;
@@ -2048,11 +2053,12 @@ axios.all = function all(promises) {
 axios.spread = spread;
 axios.isAxiosError = isAxiosError;
 axios.mergeConfig = mergeConfig;
-axios.AxiosHeaders = AxiosHeaders;
+axios.AxiosHeaders = AxiosHeaders$1;
 axios.formToJSON = (thing) => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
 axios.getAdapter = adapters.getAdapter;
-axios.HttpStatusCode = HttpStatusCode;
+axios.HttpStatusCode = HttpStatusCode$1;
 axios.default = axios;
+const axios$1 = axios;
 class Events {
   constructor() {
     __privateAdd(this, _subscriptions, /* @__PURE__ */ new Map());
@@ -2162,6 +2168,52 @@ class Storage {
   }
 }
 const storage = new Storage();
+const loadThemes = async (single) => {
+  bb.themes.list = [];
+  bb.themes.broken = [];
+  [...document.querySelectorAll("[id*='bb-theme']")].forEach((v) => v.remove());
+  let themes = storage.get("bb_themeData", true).active.filter((a) => a.trim() !== "");
+  for (let theme of themes)
+    axios$1.get(theme).then(async (res) => {
+      let data = res.data;
+      let meta = {};
+      const matches = data.match(/\/\*\*\s*\n([\s\S]*?)\*\//s)[1].split("\n");
+      if (matches)
+        matches.forEach((input) => {
+          let match = /@(\w+)\s+([\s\S]+)/g.exec(input);
+          if (match)
+            meta[match[1]] = match[2].trim();
+        });
+      else
+        return bb.themes.broken.push({
+          url: theme,
+          reason: "Theme metadata could not be found."
+        });
+      const themeStyle = document.createElement("style");
+      themeStyle.id = `bb-theme-${btoa(Math.random().toString(36).slice(2))}`;
+      themeStyle.innerHTML = data;
+      bb.themes.list.push({
+        element: themeStyle,
+        name: meta.name,
+        meta,
+        url: theme
+      });
+      document.head.appendChild(themeStyle);
+      console.log(`Loaded theme "${meta.name}".`);
+      bb.events.dispatch("themeUpdate");
+    }).catch((err) => {
+      console.log("Failed to load theme: " + theme + " - ", err.message);
+      bb.themes.broken.push({
+        url: theme,
+        reason: "Theme could not be loaded."
+      });
+      bb.events.dispatch("themeUpdate");
+    });
+  if (single)
+    console.log("Reloaded themes.");
+  else
+    console.log("Started loading themes.");
+};
 const createPlugin = ({
   name,
   description,
@@ -2194,7 +2246,7 @@ const createPlugin = ({
   };
   return plugin;
 };
-const index$i = () => createPlugin({
+const index$j = () => createPlugin({
   name: "Advanced Opener",
   description: "the fastest way to mass open blacket packs.",
   authors: [
@@ -2424,8 +2476,8 @@ const index$i = () => createPlugin({
     window.onresize = () => modal.style.top = modal.style.left = "";
   }
 });
-const __vite_glob_0_0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$i }, Symbol.toStringTag, { value: "Module" }));
-const index$h = () => createPlugin({
+const __vite_glob_0_0 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$j }, Symbol.toStringTag, { value: "Module" }));
+const index$i = () => createPlugin({
   name: "Bazaar Sniper",
   description: "pew pew! sniped right off the bazaar!",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -2435,12 +2487,12 @@ const index$h = () => createPlugin({
         return clearInterval(checkBazaar);
       if (!blacket.user)
         return;
-      axios.get("/worker/bazaar").then((bazaar) => {
+      axios$1.get("/worker/bazaar").then((bazaar) => {
         bazaar.data.bazaar.forEach((bazaarItem) => {
           let blookData = blacket.blooks[bazaarItem.item];
           if (!!!blookData || blookData.price < bazaarItem.price || bazaarItem.seller === blacket.user.username)
             return;
-          axios.post("/worker/bazaar/buy", { id: bazaarItem.id }).then((purchase) => {
+          axios$1.post("/worker/bazaar/buy", { id: bazaarItem.id }).then((purchase) => {
             if (purchase.data.error)
               return console.log(`[Bazaar Sniper] Error sniping Blook`, bazaarItem, purchase);
             console.log(`[Bazaar Sniper] Sniped a blook!`, bazaarItem);
@@ -2452,8 +2504,8 @@ Check the console for more information.`);
     }, 1e3);
   }
 });
-const __vite_glob_0_1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$h }, Symbol.toStringTag, { value: "Module" }));
-const index$g = () => createPlugin({
+const __vite_glob_0_1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$i }, Symbol.toStringTag, { value: "Module" }));
+const index$h = () => createPlugin({
   name: "Better Chat",
   description: "enhances your chatting experience!",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -2542,8 +2594,8 @@ const index$g = () => createPlugin({
     default: true
   }]
 });
-const __vite_glob_0_2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$g }, Symbol.toStringTag, { value: "Module" }));
-const index$f = () => createPlugin({
+const __vite_glob_0_2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$h }, Symbol.toStringTag, { value: "Module" }));
+const index$g = () => createPlugin({
   name: "Better Notifications",
   description: "a new and improved notification system.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -2630,8 +2682,8 @@ const index$f = () => createPlugin({
     default: false
   }]
 });
-const __vite_glob_0_3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$f }, Symbol.toStringTag, { value: "Module" }));
-const index$e = () => createPlugin({
+const __vite_glob_0_3 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$g }, Symbol.toStringTag, { value: "Module" }));
+const index$f = () => createPlugin({
   name: "Blook Utilities",
   description: "enhances the blook manager experience.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -2710,7 +2762,7 @@ const index$e = () => createPlugin({
       if (price == `` || price == 0)
         return;
       $(".arts__modal___VpEAD-camelCase").remove();
-      axios.post("/worker/bazaar/list", {
+      axios$1.post("/worker/bazaar/list", {
         item: blacket.blooks.selected,
         price
       }).then((list) => {
@@ -2803,7 +2855,7 @@ const index$e = () => createPlugin({
       });
       let result = await modal.listen();
       if (result.button.toString() === "0") {
-        axios.get("/worker2/user/" + result.inputs[0].value).then((u) => {
+        axios$1.get("/worker2/user/" + result.inputs[0].value).then((u) => {
           if (u.data.error)
             return new bb.Modal({
               title: "User not found.",
@@ -2874,10 +2926,10 @@ const index$e = () => createPlugin({
     };
   }
 });
-const __vite_glob_0_4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$e }, Symbol.toStringTag, { value: "Module" }));
+const __vite_glob_0_4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$f }, Symbol.toStringTag, { value: "Module" }));
 const badges = async (...args) => {
   if (args[0])
-    axios.get("/worker2/user/" + args[0]).then((u) => {
+    axios$1.get("/worker2/user/" + args[0]).then((u) => {
       if (u.data.error)
         bb.plugins.deafbot.send(`Error fetching user ${args[0]}: **${u.data.reason}**`);
       else
@@ -2889,7 +2941,7 @@ const badges = async (...args) => {
 const blocks = async (...args) => {
   switch (args[0]) {
     case "list":
-      axios.get("/worker2/friends").then((f) => {
+      axios$1.get("/worker2/friends").then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error fetching blocks: **${f.data.reason}**`);
         else
@@ -2899,7 +2951,7 @@ const blocks = async (...args) => {
     case "add":
       if (!args[1])
         return bb.plugins.deafbot.send(`Whoa - you want to block yourself or something? Tell me who to block!`);
-      axios.post("/worker/friends/block", { user: args[1] }).then((f) => {
+      axios$1.post("/worker/friends/block", { user: args[1] }).then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error blocking user: **${f.data.reason}**. I guess they get mercy for now.`);
         else
@@ -2909,7 +2961,7 @@ const blocks = async (...args) => {
     case "remove":
       if (!args[1])
         return bb.plugins.deafbot.send(`Tell me to remove, or keep hating people. I don't care.`);
-      axios.post("/worker/friends/unblock", { user: args[1] }).then((f) => {
+      axios$1.post("/worker/friends/unblock", { user: args[1] }).then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error removing block: **${f.data.reason}**. L them.`);
         else
@@ -2919,7 +2971,7 @@ const blocks = async (...args) => {
     case "check":
       if (!args[1])
         return bb.plugins.deafbot.send(`Specify a username to check.`);
-      axios.get("/worker2/friends").then((f) => {
+      axios$1.get("/worker2/friends").then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error fetching blocks: **${f.data.reason}**`);
         else
@@ -2943,7 +2995,7 @@ const blooks = async (...args) => {
     else
       return bb.plugins.deafbot.send(`You don't have **${args.slice(1).join(" ")}**.`);
   }
-  axios.get("/worker2/user/" + args[0]).then((u) => {
+  axios$1.get("/worker2/user/" + args[0]).then((u) => {
     if (u.data.error)
       bb.plugins.deafbot.send(`Error fetching user ${args[0]}: **${u.data.reason}**`);
     if (args[1]) {
@@ -2958,15 +3010,15 @@ const blooks = async (...args) => {
     bb.plugins.deafbot.send(`**${u.data.user.username}** has **${Object.keys(u.data.user.blooks).length}** unique blooks (**${Object.values(u.data.user.blooks).reduce((partialSum, a) => partialSum + a, 0)}** total), consisting of **${Object.keys(u.data.user.blooks).filter((b) => blacket.blooks[b].rarity === "Uncommon").length}** Uncommons, **${Object.keys(u.data.user.blooks).filter((b) => blacket.blooks[b].rarity === "Rare").length}** Rares, **${Object.keys(u.data.user.blooks).filter((b) => blacket.blooks[b].rarity === "Epic").length}** Epics, **${Object.keys(u.data.user.blooks).filter((b) => blacket.blooks[b].rarity === "Legendary").length}** Legendaries, **${Object.keys(u.data.user.blooks).filter((b) => blacket.blooks[b].rarity === "Chroma").length}** Chromas, and **${Object.keys(u.data.user.blooks).filter((b) => blacket.blooks[b].rarity === "Mystical").length}** Mysticals.`);
   });
 };
-const booster = async (...args) => {
-  let b = await axios.get("/data/index.json");
+const booster = async () => {
+  let b = await axios$1.get("/data/index.json");
   if (!b.data.booster.active)
     return bb.plugins.deafbot.send("There is no active booster.");
-  let u = await axios.get("/worker2/user/" + b.data.booster.user);
+  let u = await axios$1.get("/worker2/user/" + b.data.booster.user);
   bb.plugins.deafbot.send(`<@${u.data.user.id}> (${u.data.user.username}) is boosting with a ${b.data.booster.multiplier}x booster until ${new Date(b.data.booster.time * 1e3).toLocaleTimeString().replaceAll(" ", " ")}!`);
 };
 const cheapest = async (...args) => {
-  axios.get("/worker/bazaar?item=" + args.join(" ")).then((b) => {
+  axios$1.get("/worker/bazaar?item=" + args.join(" ")).then((b) => {
     if (b.data.error)
       return bb.plugins.deafbot.send(`Error fetching bazaar: **${b.data.reason}**`);
     let items = b.data.bazaar.filter((i) => i.item.toLowerCase() === args.join(" ").toLowerCase());
@@ -2976,8 +3028,8 @@ const cheapest = async (...args) => {
     bb.plugins.deafbot.send(`The cheapest listing for **${cheapest2.item}** costs **${cheapest2.price.toLocaleString()}** tokens & is sold by **${cheapest2.seller}**.`);
   });
 };
-const claim = async (...args) => {
-  let claim2 = await axios.get("/worker/claim");
+const claim = async () => {
+  let claim2 = await axios$1.get("/worker/claim");
   if (claim2.data.error)
     bb.plugins.deafbot.send(`Error: **${claim2.data.reason}**`);
   else
@@ -2985,14 +3037,14 @@ const claim = async (...args) => {
 };
 const clan = async (...args) => {
   if (!args[0])
-    axios.get("/worker/clans").then((clan2) => {
+    axios$1.get("/worker/clans").then((clan2) => {
       if (clan2.data.error)
         return bb.plugins.deafbot.send(`Error fetching your clan: **${clan2.data.reason}**`);
       let clanData = clan2.data.clan;
       bb.plugins.deafbot.send(`You are in the ${clanData.members.map((a) => a.username).includes("Death") ? "esteemed " : ""}**${clanData.name}** clan, owned by **${clanData.owner.username}**. You have **${clanData.members.length}** (**${clanData.online}** online) members, and **[REDACTED]** investments. The clan **${clanData.safe ? "is" : "is not"}** in safe mode.`);
     });
   else
-    axios.get("/worker/clans/discover/name/" + args.join(" ")).then((clan2) => {
+    axios$1.get("/worker/clans/discover/name/" + args.join(" ")).then((clan2) => {
       if (clan2.data.error)
         return bb.plugins.deafbot.send(`Error fetching clan: **${clan2.data.reason}**`);
       clan2 = clan2.data.clans[0];
@@ -3003,7 +3055,7 @@ const color = async (...args) => {
   if (!args[0])
     return bb.plugins.deafbot.send(`Choose a subcommand: **name** or **text**.`);
   if (args[0].toLowerCase() === "name")
-    axios.post("https://blacket.org/worker/settings/color", {
+    axios$1.post("https://blacket.org/worker/settings/color", {
       color: `#${args[1].replace("#", "")}`
     }).then((r) => {
       if (r.data.error)
@@ -3024,7 +3076,7 @@ const color = async (...args) => {
 const friends = async (...args) => {
   switch (args[0]) {
     case "list":
-      axios.get("/worker2/friends").then((f) => {
+      axios$1.get("/worker2/friends").then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error fetching friends: **${f.data.reason}**`);
         else
@@ -3034,7 +3086,7 @@ const friends = async (...args) => {
     case "request":
       if (!args[1])
         return bb.plugins.deafbot.send(`Tell me who you actually want to request, you friendless fool.`);
-      axios.post("/worker/friends/request", { user: args[1] }).then((f) => {
+      axios$1.post("/worker/friends/request", { user: args[1] }).then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error friending: **${f.data.reason}** - ig you just don't want friends.`);
         else
@@ -3044,7 +3096,7 @@ const friends = async (...args) => {
     case "accept":
       if (!args[1])
         return bb.plugins.deafbot.send(`Tell me who you actually want to accept, you friendless fool.`);
-      axios.post("/worker/friends/accept", { user: args[1] }).then((f) => {
+      axios$1.post("/worker/friends/accept", { user: args[1] }).then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error accepting: **${f.data.reason}** - ig you just don't want friends.`);
         else
@@ -3054,7 +3106,7 @@ const friends = async (...args) => {
     case "remove":
       if (!args[1])
         return bb.plugins.deafbot.send(`So you want to KEEP all your bad friends? Tell me who to get rid of!`);
-      axios.post("/worker/friends/remove", { user: args[1] }).then((f) => {
+      axios$1.post("/worker/friends/remove", { user: args[1] }).then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error removing: **${f.data.reason}** - L you. With them forever.`);
         else
@@ -3064,7 +3116,7 @@ const friends = async (...args) => {
     case "check":
       if (!args[1])
         return bb.plugins.deafbot.send(`Specify a username to check.`);
-      axios.get("/worker2/friends").then((f) => {
+      axios$1.get("/worker2/friends").then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error fetching friends: **${f.data.reason}**`);
         else
@@ -3075,7 +3127,7 @@ const friends = async (...args) => {
     case "incoming":
     case "pending":
     case "recieving":
-      axios.get("/worker2/friends").then((f) => {
+      axios$1.get("/worker2/friends").then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error fetching friends: **${f.data.reason}**`);
         else
@@ -3085,7 +3137,7 @@ const friends = async (...args) => {
     case "requested":
     case "outgoing":
     case "sending":
-      axios.get("/worker2/friends").then((f) => {
+      axios$1.get("/worker2/friends").then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error fetching friends: **${f.data.reason}**`);
         else
@@ -3095,7 +3147,7 @@ const friends = async (...args) => {
     case "mutual":
       if (!args[1])
         return bb.plugins.deafbot.send(`Tell me who you want to check for mutual friends, fool.`);
-      axios.get("/worker2/user/" + args[1]).then((f) => {
+      axios$1.get("/worker2/user/" + args[1]).then((f) => {
         if (f.data.error)
           bb.plugins.deafbot.send(`Error: **${f.data.reason}**`);
         else
@@ -3109,7 +3161,7 @@ const friends = async (...args) => {
 };
 const id = async (...args) => {
   if (args[0])
-    axios.get("/worker2/user/" + args[0]).then((u) => {
+    axios$1.get("/worker2/user/" + args[0]).then((u) => {
       if (u.data.error)
         bb.plugins.deafbot.send(`Error: **${u.data.reason}**`);
       else
@@ -3132,7 +3184,7 @@ const level = async (...args) => {
     return level2;
   };
   if (args[0])
-    axios.get("/worker2/user/" + args[0]).then((u) => {
+    axios$1.get("/worker2/user/" + args[0]).then((u) => {
       if (u.data.error)
         bb.plugins.deafbot.send(`Error fetching user ${args[0]}: **${u.data.reason}**`);
       else
@@ -3143,7 +3195,7 @@ const level = async (...args) => {
 };
 const tokens = async (...args) => {
   if (args[0])
-    axios.get("/worker2/user/" + args[0]).then((u) => {
+    axios$1.get("/worker2/user/" + args[0]).then((u) => {
       if (u.data.error)
         bb.plugins.deafbot.send(`Error fetching user ${args[0]}: **${u.data.reason}**`);
       else
@@ -3155,10 +3207,10 @@ const tokens = async (...args) => {
 const trade = async (...args) => {
   if (!args[0])
     return bb.plugins.deafbot.send(`Who are you trying to trade, yourself?`);
-  axios.get("/worker2/user/" + args[0]).then((u) => {
+  axios$1.get("/worker2/user/" + args[0]).then((u) => {
     if (u.data.error)
       return bb.plugins.deafbot.send(`Error fetching user ${args[0]}: **${u.data.reason}**`);
-    axios.post("/worker/trades/requests/send", { user: u.data.user.id.toString() }).then((r) => {
+    axios$1.post("/worker/trades/requests/send", { user: u.data.user.id.toString() }).then((r) => {
       if (r.data.error)
         bb.plugins.deafbot.send(`Error sending trade request to ${u.data.user.username}: **${r.data.reason}**`);
       else
@@ -3181,7 +3233,7 @@ const commands = {
   tokens,
   trade
 };
-const index$d = () => createPlugin({
+const index$e = () => createPlugin({
   name: "DeafBot",
   description: "the chatbot you know and love.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -3221,8 +3273,8 @@ const index$d = () => createPlugin({
     };
   }
 });
-const __vite_glob_0_5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$d }, Symbol.toStringTag, { value: "Module" }));
-const index$c = () => createPlugin({
+const __vite_glob_0_5 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$e }, Symbol.toStringTag, { value: "Module" }));
+const index$d = () => createPlugin({
   name: "Double Leaderboard",
   description: "see both leaderboards together.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -3273,8 +3325,8 @@ const index$c = () => createPlugin({
         </style>`);
   }
 });
-const __vite_glob_0_6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$c }, Symbol.toStringTag, { value: "Module" }));
-const index$b = () => createPlugin({
+const __vite_glob_0_6 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$d }, Symbol.toStringTag, { value: "Module" }));
+const index$c = () => createPlugin({
   name: "Extra Stats",
   description: "gives you extra stats for users.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -3328,8 +3380,8 @@ const index$b = () => createPlugin({
         `);
   }
 });
-const __vite_glob_0_7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$b }, Symbol.toStringTag, { value: "Module" }));
-const index$a = () => createPlugin({
+const __vite_glob_0_7 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$c }, Symbol.toStringTag, { value: "Module" }));
+const index$b = () => createPlugin({
   name: "Highlight Rarity",
   description: "displays the rarity of Bazaar blooks.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -3349,8 +3401,8 @@ const index$a = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$a }, Symbol.toStringTag, { value: "Module" }));
-const index$9 = () => createPlugin({
+const __vite_glob_0_8 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$b }, Symbol.toStringTag, { value: "Module" }));
+const index$a = () => createPlugin({
   name: "Internals",
   description: "the internals of BetterBlacket.",
   authors: [{ name: "Internal" }],
@@ -3578,6 +3630,10 @@ const index$9 = () => createPlugin({
         {
           match: /data\.author\.badges = \[/,
           replace: `if (typeof data.author.badges !== 'object' && !data?.author?.badges?.length) data.author.badges = [`
+        },
+        {
+          match: /data\.friends/,
+          replace: `data.friends.filter(f => f.username !== '£')`
         }
       ]
     }
@@ -3957,16 +4013,14 @@ const index$9 = () => createPlugin({
       document.querySelector(`#bb_pluginCheckbox_${p.name.replaceAll(" ", "-")}`).onchange = (ev) => {
         if (p.required)
           return ev.target.checked = true;
-        if (!bb.plugins.pendingChanges && (p.patches.length || storedPluginData.active.includes(p.name))) {
-          const inform = () => blacket.createToast({
-            title: "Pending Changes",
-            message: "You have changes in your plugins you have not applied. Reload to apply.",
-            time: 5e3
-          });
-          inform();
-          setInterval(() => inform(), 1e4);
-          bb.plugins.pendingChanges = true;
-        }
+        const inform = () => blacket.createToast({
+          title: "Pending Changes",
+          message: "You have changes in your plugins you have not applied. Reload to apply.",
+          time: 5e3
+        });
+        inform();
+        setInterval(() => inform(), 1e4);
+        bb.plugins.pendingChanges = true;
         if (storedPluginData.active.includes(p.name))
           storedPluginData.active.splice(storedPluginData.active.indexOf(p.name), 1);
         else
@@ -4017,8 +4071,8 @@ const index$9 = () => createPlugin({
     });
   }
 });
-const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$9 }, Symbol.toStringTag, { value: "Module" }));
-const index$8 = () => createPlugin({
+const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$a }, Symbol.toStringTag, { value: "Module" }));
+const index$9 = () => createPlugin({
   name: "Message Logger",
   description: "view deleted messages like a staff would.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -4035,8 +4089,8 @@ const index$8 = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_10 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$8 }, Symbol.toStringTag, { value: "Module" }));
-const index$7 = () => createPlugin({
+const __vite_glob_0_10 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$9 }, Symbol.toStringTag, { value: "Module" }));
+const index$8 = () => createPlugin({
   name: "No Chat Color",
   description: "disables color in chat.",
   authors: [{ name: "Syfe", avatar: "https://i.imgur.com/OKpOipQ.gif", url: "https://github.com/ItsSyfe" }],
@@ -4074,8 +4128,8 @@ const index$7 = () => createPlugin({
     { name: "No Clan Colors", default: true }
   ]
 });
-const __vite_glob_0_11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$7 }, Symbol.toStringTag, { value: "Module" }));
-const index$6 = () => createPlugin({
+const __vite_glob_0_11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$8 }, Symbol.toStringTag, { value: "Module" }));
+const index$7 = () => createPlugin({
   name: "No Chat Ping",
   description: "prevents you from being pinged in chat.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -4105,8 +4159,8 @@ const index$6 = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$6 }, Symbol.toStringTag, { value: "Module" }));
-const index$5 = () => createPlugin({
+const __vite_glob_0_12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$7 }, Symbol.toStringTag, { value: "Module" }));
+const index$6 = () => createPlugin({
   name: "No Devtools Warning",
   description: "disables the warning in the console.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -4122,8 +4176,8 @@ const index$5 = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_13 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$5 }, Symbol.toStringTag, { value: "Module" }));
-const index$4 = () => createPlugin({
+const __vite_glob_0_13 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$6 }, Symbol.toStringTag, { value: "Module" }));
+const index$5 = () => createPlugin({
   name: "Quick CSS",
   description: "edit CSS for the game and have it applied instantly.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -4248,8 +4302,8 @@ const index$4 = () => createPlugin({
     };
   }
 });
-const __vite_glob_0_14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$4 }, Symbol.toStringTag, { value: "Module" }));
-const index$3 = () => createPlugin({
+const __vite_glob_0_14 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$5 }, Symbol.toStringTag, { value: "Module" }));
+const index$4 = () => createPlugin({
   name: "Real Total blooks",
   description: "displays the true number of total blooks on the stats page.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -4265,8 +4319,8 @@ const index$3 = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_15 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$3 }, Symbol.toStringTag, { value: "Module" }));
-const index$2 = () => createPlugin({
+const __vite_glob_0_15 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$4 }, Symbol.toStringTag, { value: "Module" }));
+const index$3 = () => createPlugin({
   name: "Reply Fix",
   description: "fixes blacket's broken replies.",
   authors: [{ name: "Syfe", avatar: "https://i.imgur.com/OKpOipQ.gif", url: "https://github.com/ItsSyfe" }],
@@ -4288,8 +4342,8 @@ const index$2 = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_16 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$2 }, Symbol.toStringTag, { value: "Module" }));
-const index$1 = () => createPlugin({
+const __vite_glob_0_16 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$3 }, Symbol.toStringTag, { value: "Module" }));
+const index$2 = () => createPlugin({
   name: "SpeedUp",
   description: "Decrease Blacket's loading speed.",
   authors: [{ name: "zastix", avatar: "https://files.villainsrule.xyz/misc/zastix.png", url: "https://zastix.club/" }],
@@ -4389,8 +4443,8 @@ const index$1 = () => createPlugin({
   },
   initedChat: false
 });
-const __vite_glob_0_17 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$1 }, Symbol.toStringTag, { value: "Module" }));
-const index = () => createPlugin({
+const __vite_glob_0_17 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$2 }, Symbol.toStringTag, { value: "Module" }));
+const index$1 = () => createPlugin({
   name: "Staff Tags",
   description: "gives staff who speak in chat a special tag.",
   authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
@@ -4426,7 +4480,50 @@ const index = () => createPlugin({
     }
   ]
 });
-const __vite_glob_0_18 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index }, Symbol.toStringTag, { value: "Module" }));
+const __vite_glob_0_18 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index$1 }, Symbol.toStringTag, { value: "Module" }));
+const index = () => createPlugin({
+  name: "Tokens Everywhere",
+  description: "shows your token count on ALL pages!",
+  authors: [{ name: "Death", avatar: "https://i.imgur.com/PrvNWub.png", url: "https://villainsrule.xyz" }],
+  patches: [
+    {
+      file: "/lib/js/game.js",
+      replacement: [
+        {
+          match: /\$\("#roomDropdownGlobal"\)/,
+          replace: `$self.updateTokens();$("#roomDropdownGlobal")`
+        }
+      ]
+    },
+    {
+      file: "/lib/js/blooks.js",
+      replacement: [
+        {
+          match: /-= quantity;/,
+          replace: `-= quantity;blacket.user.tokens += blacket.blooks[blacket.blooks.selected].price*quantity;$self.updateTokens();`
+        }
+      ]
+    }
+  ],
+  updateTokens: () => $("#tokenBalance > div:nth-child(2)").html(blacket.user.tokens.toLocaleString()),
+  onLoad: () => {
+    if ([
+      "leaderboard",
+      "clans/discover",
+      "blooks",
+      "inventory",
+      "settings"
+    ].some((path) => location.pathname.startsWith(`/${path}`))) {
+      document.querySelector(".styles__topRightRow___dQvxc-camelCase").insertAdjacentHTML("afterbegin", `
+                <div id="tokenBalance" class="styles__tokenBalance___1FHgT-camelCase">
+                    <img loading="lazy" src="/content/tokenIcon.png" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false">
+                    <div>tokens</div>
+                </div>
+            `);
+    }
+  }
+});
+const __vite_glob_0_19 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({ __proto__: null, default: index }, Symbol.toStringTag, { value: "Module" }));
 const patcher = () => {
   let blacklistedKeywords = ["cdn-cgi", "jquery", "jscolor"];
   let scripts = [...document.querySelectorAll("script")].filter((script) => !blacklistedKeywords.some((k) => script.src.includes(k))).filter((script) => script.src.includes(location.host)).map((script) => script.src);
@@ -4440,7 +4537,7 @@ const patcher = () => {
             patched.push(node.src);
             node.removeAttribute("src");
             try {
-              let { data } = await axios.get(src);
+              let { data } = await axios$1.get(src);
               let filePatches = bb.patches.filter((e) => src.replace(location.origin, "").startsWith(e.file));
               for (const patch of filePatches)
                 for (const replacement of patch.replacement) {
@@ -4506,7 +4603,7 @@ ${url}`);
 const loadPlugins = async () => {
   let pluginData = storage.get("bb_pluginData", true);
   let contentLoaded = false;
-  await Promise.all(Object.values(/* @__PURE__ */ Object.assign({ "../plugins/advancedopen/index.js": __vite_glob_0_0, "../plugins/bazaarsniper/index.js": __vite_glob_0_1, "../plugins/betterchat/index.js": __vite_glob_0_2, "../plugins/betternotifications/index.js": __vite_glob_0_3, "../plugins/blookutils/index.js": __vite_glob_0_4, "../plugins/deafbot/index.js": __vite_glob_0_5, "../plugins/doubleleaderboard/index.js": __vite_glob_0_6, "../plugins/extrastats/index.js": __vite_glob_0_7, "../plugins/highlightrarity/index.js": __vite_glob_0_8, "../plugins/internals/index.js": __vite_glob_0_9, "../plugins/messagelogger/index.js": __vite_glob_0_10, "../plugins/nochatcolor/index.js": __vite_glob_0_11, "../plugins/nochatping/index.js": __vite_glob_0_12, "../plugins/nodevtoolswarn/index.js": __vite_glob_0_13, "../plugins/quickcss/index.js": __vite_glob_0_14, "../plugins/realtotalblooks/index.js": __vite_glob_0_15, "../plugins/replyfix/index.js": __vite_glob_0_16, "../plugins/speedup/index.js": __vite_glob_0_17, "../plugins/stafftags/index.js": __vite_glob_0_18 })).map(async (pluginFile) => {
+  await Promise.all(Object.values(/* @__PURE__ */ Object.assign({ "../plugins/advancedopen/index.js": __vite_glob_0_0, "../plugins/bazaarsniper/index.js": __vite_glob_0_1, "../plugins/betterchat/index.js": __vite_glob_0_2, "../plugins/betternotifications/index.js": __vite_glob_0_3, "../plugins/blookutils/index.js": __vite_glob_0_4, "../plugins/deafbot/index.js": __vite_glob_0_5, "../plugins/doubleleaderboard/index.js": __vite_glob_0_6, "../plugins/extrastats/index.js": __vite_glob_0_7, "../plugins/highlightrarity/index.js": __vite_glob_0_8, "../plugins/internals/index.js": __vite_glob_0_9, "../plugins/messagelogger/index.js": __vite_glob_0_10, "../plugins/nochatcolor/index.js": __vite_glob_0_11, "../plugins/nochatping/index.js": __vite_glob_0_12, "../plugins/nodevtoolswarn/index.js": __vite_glob_0_13, "../plugins/quickcss/index.js": __vite_glob_0_14, "../plugins/realtotalblooks/index.js": __vite_glob_0_15, "../plugins/replyfix/index.js": __vite_glob_0_16, "../plugins/speedup/index.js": __vite_glob_0_17, "../plugins/stafftags/index.js": __vite_glob_0_18, "../plugins/tokenseverywhere/index.js": __vite_glob_0_19 })).map(async (pluginFile) => {
     let plugin = pluginFile.default();
     bb.plugins.list.push(plugin);
     if (!!plugin.styles)
@@ -4554,59 +4651,12 @@ const loadPlugins = async () => {
   console.log("Plugin data loaded. Starting patcher...");
   patcher();
 };
-const loadThemes = async (single) => {
-  bb.themes.list = [];
-  bb.themes.broken = [];
-  [...document.querySelectorAll("[id*='bb-theme']")].forEach((v) => v.remove());
-  let themes = storage.get("bb_themeData", true).active.filter((a) => a.trim() !== "");
-  for (let theme of themes) {
-    axios.get(theme).then(async (res) => {
-      let data = res.data;
-      let meta = {};
-      const matches = data.match(/\/\*\*\s*\n([\s\S]*?)\*\//s)[1].split("\n");
-      if (matches)
-        matches.forEach((input) => {
-          let match = /@(\w+)\s+([\s\S]+)/g.exec(input);
-          if (match)
-            meta[match[1]] = match[2].trim();
-        });
-      else
-        return bb.themes.broken.push({
-          url: theme,
-          reason: "Theme metadata could not be found."
-        });
-      const themeStyle = document.createElement("style");
-      themeStyle.id = `bb-theme-${btoa(Math.random().toString(36).slice(2))}`;
-      themeStyle.innerHTML = data;
-      bb.themes.list.push({
-        element: themeStyle,
-        name: meta.name,
-        meta,
-        url: theme
-      });
-      document.head.appendChild(themeStyle);
-      console.log(`Loaded theme "${meta.name}".`);
-      bb.events.dispatch("themeUpdate");
-    }).catch((err) => {
-      console.log("Failed to load theme: " + theme + " - ", err.message);
-      bb.themes.broken.push({
-        url: theme,
-        reason: "Theme could not be loaded."
-      });
-      bb.events.dispatch("themeUpdate");
-    });
-  }
-  if (single)
-    return console.log("Reloaded themes.");
-  console.log("Started loading themes. Calling loadPlugins()...");
-  loadPlugins();
-};
 if (!storage.get("bb_pluginData"))
   storage.set("bb_pluginData", { active: [], settings: {} }, true);
 if (!storage.get("bb_themeData"))
   storage.set("bb_themeData", { active: [] }, true);
 window.bb = {
-  axios,
+  axios: axios$1,
   events,
   Modal,
   storage,
@@ -4624,4 +4674,5 @@ window.bb = {
   patches: []
 };
 console.log('Defined global "bb" variable:', bb, "Calling loadThemes()...");
-loadThemes();
+setTimeout(() => loadThemes(), 0);
+setTimeout(() => loadPlugins(), 0);

@@ -66,6 +66,6 @@ export default class Modal {
             });
         });
     };
-    
+
     close = () => this.element.remove();
 };

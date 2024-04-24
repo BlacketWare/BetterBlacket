@@ -54,7 +54,7 @@ export default async (...args) => {
                 else bb.plugins.deafbot.send(`You have **${f.data.receiving.length}** incoming requests: ${f.data.receiving.map(f => f.username).join(', ')}`);
             });
             break;
-        
+
         case 'requested':
         case 'outgoing':
         case 'sending':

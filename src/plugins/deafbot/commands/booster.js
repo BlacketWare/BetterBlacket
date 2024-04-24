@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export default async (...args) => {
+export default async () => {
     let b = await axios.get('/data/index.json');
     if (!b.data.booster.active) return bb.plugins.deafbot.send('There is no active booster.');
 

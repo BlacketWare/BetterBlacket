@@ -228,6 +228,10 @@ export default () => createPlugin({
                 {
                     match: /data\.author\.badges = \[/,
                     replace: `if (typeof data.author.badges !== 'object' && !data?.author?.badges?.length) data.author.badges = [`
+                },
+                {
+                    match: /data\.friends/,
+                    replace: `data.friends.filter(f => f.username !== '£')`
                 }
             ]
         }
@@ -621,16 +625,14 @@ export default () => createPlugin({
             document.querySelector(`#bb_pluginCheckbox_${p.name.replaceAll(' ', '-')}`).onchange = (ev) => {
                 if (p.required) return ev.target.checked = true;
 
-                if (!bb.plugins.pendingChanges && (p.patches.length || storedPluginData.active.includes(p.name))) {
-                    const inform = () => blacket.createToast({
-                        title: 'Pending Changes',
-                        message: 'You have changes in your plugins you have not applied. Reload to apply.',
-                        time: 5000
-                    });
-                    inform();
-                    setInterval(() => inform(), 10000);
-                    bb.plugins.pendingChanges = true;
-                };
+                const inform = () => blacket.createToast({
+                    title: 'Pending Changes',
+                    message: 'You have changes in your plugins you have not applied. Reload to apply.',
+                    time: 5000
+                });
+                inform();
+                setInterval(() => inform(), 10000);
+                bb.plugins.pendingChanges = true;
 
                 if (storedPluginData.active.includes(p.name)) storedPluginData.active.splice(storedPluginData.active.indexOf(p.name), 1);
                 else storedPluginData.active.push(p.name);
