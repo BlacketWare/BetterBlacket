@@ -72,9 +72,16 @@ export default async (...args) => {
                 else bb.plugins.deafbot.send(`You and **${f.data.user.username}** have **${f.data.user.friends.length}** mutual friends: ${f.data.user.friends.map(f => blacket.friends.friends.find(fr => fr.id === f)).map(a => a?.username).filter(a => a).join(', ')}`);
             });
             break;
+            
+        case 'count':
+            axios.get('/worker2/friends').then((f) => {
+                if (f.data.error) bb.plugins.deafbot.send(`Error fetching friends: **${f.data.reason}**`);
+                else bb.plugins.deafbot.send(`You have **${f.data.friends.length}** friends.`);
+            });
+            break;
 
         default:
-            bb.plugins.deafbot.send(`Subcommands: **list** ~ **request** ~ **accept** ~ **remove** ~ **check**`);
+            bb.plugins.deafbot.send(`Subcommands: **list** ~ **request** ~ **accept** ~ **remove** ~ **check** ~ **mutual** ~ **requests** ~ **sending** ~ **count**`);
             break;
     };
 };

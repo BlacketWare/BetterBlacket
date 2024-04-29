@@ -30,7 +30,13 @@ export default () => createPlugin({
             'Big Spender': 'https://i.imgur.com/bpr9QoT.png'
         };
 
+        if (bb.plugins.settings['OldBadges']['Co-Owner to Owner']) oldBadges['Co-Owner'] = oldBadges['Owner'];
+
         Object.entries(oldBadges).forEach(([badge, url]) => data.badges[badge].image = url);
         return data;
-    }
+    },
+    settings: [{
+        name: 'Co-Owner to Owner',
+        default: false
+    }]
 });

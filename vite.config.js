@@ -18,7 +18,8 @@ export default defineConfig({
             output: {
                 entryFileNames: 'bb.min.js',
                 compact: true
-            }
+            },
+            onwarn: () => {}
         },
         minify: false
     }
