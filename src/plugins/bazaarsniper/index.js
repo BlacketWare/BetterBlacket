@@ -19,10 +19,10 @@ export default () => createPlugin({
                         if (purchase.data.error) return console.log(`[Bazaar Sniper] Error sniping Blook`, bazaarItem, purchase);
 
                         console.log(`[Bazaar Sniper] Sniped a blook!`, bazaarItem);
-                        alert(`Sniped Blook ${bazaarItem.item} from seller ${bazaarItem.seller} with price ${bazaarItem.price}!\nCheck the console for more information.`);
+                        blacket.createToast({ message: `Sniped Blook ${bazaarItem.item} from seller ${bazaarItem.seller} with price ${bazaarItem.price}!` });
                     });
                 });
             });
-        }, 1000);
+        }, 750);
     }
 });

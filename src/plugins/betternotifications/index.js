@@ -30,6 +30,18 @@ export default () => createPlugin({
                     match: /Notification\.permission !== "granted" && Notification\.permission !== "denied"/,
                     replace: 'false',
                     setting: 'Disable Desktop'
+                },
+                {
+                    match: /3500/,
+                    replace: '1000',
+                },
+                {
+                    match: /flyOut 0\.35s ease-in-out/,
+                    replace: `styles__oldGrowOut___3FTko-camelCase 0.5s linear`
+                },
+                {
+                    match: /flyIn 0.35s ease-in-out/,
+                    replace: `styles__oldGrowIn___3FTko-camelCase 0.5s linear`
                 }
             ]
         }
@@ -58,8 +70,8 @@ export default () => createPlugin({
 
             $('#app').append(`
                 <div id='${id}' class='toastMessage'>
-                    <text style='color: white; font-size:25px;'>${title}</text>
-                    <text style='color: white; font-size:20px;'>${message}</text>
+                    ${title ? `<text style='color: white; font-size:25px;'>${title}</text>` : ''}
+                    ${message ? `<text style='color: white; font-size:20px;'>${message}</text>` : ''}
                 </div>
             `);
 

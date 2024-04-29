@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+import patcher from './internals/patcher';
+patcher.start();
+
 import events from 'utils/events.js';
 import Modal from 'utils/modal.js';
 import storage from 'utils/storage.js';
@@ -26,7 +29,7 @@ window.bb = {
     patches: []
 };
 
-console.log('Defined global "bb" variable:', bb, 'Calling loadThemes()...');
+console.log('Defined global "bb" variable:', bb);
 
 import loadThemes from 'internals/loadThemes.js';
 import loadPlugins from './internals/loadPlugins';

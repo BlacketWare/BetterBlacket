@@ -10,21 +10,20 @@ export default () => createPlugin({
     styles: `
         .bb_openModal {
             font-family: "Nunito", sans-serif;
-            font-size: 14px;
-            height: 350px;
+            font-size: 1vw;
+            height: 40vw;
             width: 22vw;
-            border: 4px solid #262626;
+            border: 3px solid #262626;
             background: #2f2f2f;
             position: absolute;
             bottom: 1vw;
             right: 1vw;
-            border-radius: 10px;
-            color: rgb(0, 0, 0);
+            border-radius: 7.5px;
             text-align: center;
             color: white;
             overflow: auto;
             padding: 2vw;
-        } 
+        }
 
         .bb_openIcons {
             position: absolute;
@@ -51,7 +50,7 @@ export default () => createPlugin({
 
         .bb_opened {
             margin-top: 1.5vw;
-            max-height: 12vw;
+            height: 27vw;
             overflow: auto;
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -76,7 +75,7 @@ export default () => createPlugin({
         }
 
         .bb_openButton {
-            font-size: 20px;
+            font-size: 1.8vw;
             cursor: pointer;
             width: 100%;
             height: 2.6vw;
@@ -182,8 +181,17 @@ export default () => createPlugin({
                     opened.push(attainedBlook);
                     openedCount = opened.length;
 
+                    let count = opened.reduce((acc, blook) => {
+                        acc[blook] = (acc[blook] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    Object.entries(count).map((x) => `    ${x[1]} ${x[0]}`).join(`\n`)
+
                     document.querySelector('.bb_openedCount').innerHTML = `${pack} | ${openedCount}/${qty} opened`;
-                    document.querySelector('.bb_opened').insertAdjacentHTML('beforeend', `<div class="bb_openResult" style="color: ${blacket.rarities[blacket.blooks[attainedBlook].rarity].color};">${attainedBlook}</div>`);
+                    document.querySelector('.bb_opened').innerHTML = Object.entries(count).map(([ blook, qtyOf ]) => {
+                        return `<div class="bb_openResult" style="color: ${blacket.rarities[blacket.blooks[blook].rarity].color};">${blook} x${qtyOf}</div>`
+                    }).join('');
                     await new Promise((r) => setTimeout(r, delay));
                 } catch (err) {
                     console.log(err);
@@ -191,9 +199,7 @@ export default () => createPlugin({
                 }
             }
 
-            let count = {};
-            opened.forEach(blook => count[blook] = (count[blook] || 0) + 1);
-            alert(`Final Results:\n` + Object.entries(count).map((x) => `    ${x[1]} ${x[0]}`).join(`\n`));
+            alert(`Open Complete! Opened ${qty}x ${pack}, spending ${cost.toLocaleString()} tokens!`);
 
             document.querySelector('.bb_openedCount').innerHTML = 'Opening ended!';
             document.querySelector('.bb_openButton').onclick = () => bb.plugins.massopen.start();

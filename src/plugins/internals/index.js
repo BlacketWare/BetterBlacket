@@ -232,6 +232,140 @@ export default () => createPlugin({
                 {
                     match: /data\.friends/,
                     replace: `data.friends.filter(f => f.username !== '£')`
+                },
+                {
+                    match: /forEach\(post \=\> \{/,
+                    replace: `forEach(post => {blacket.news[post].body=blacket.news[post].body.replace(/\\<iframe.*?iframe\>/, '');`
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/home.js',
+            replacement: [
+                {
+                    match: /blacket\.user\)/,
+                    replace: 'window.blacket?.user)'
+                },
+                {
+                    match: /Loading\(\)/,
+                    replace: `Loading\(\);bb.events.dispatch('pageInit')`
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/console.js',
+            replacement: [
+                {
+                    match: /blacket\.user && blacket\.socket/,
+                    replace: `window.blacket?.user && window.blacket?.socket`
+                },
+                {
+                    match: /blacket\.socket\.on/,
+                    replace: `bb.events.dispatch('pageInit');blacket.socket.on`
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/blooks.js',
+            replacement: [
+                {
+                    match: /blacket\.config/,
+                    replace: 'window?.blacket?.config'
+                },
+                {
+                    match: /\$\("#createButtonBlook"\)\.c/,
+                    replace: 'bb.events.dispatch(\'pageInit\');$("#createButtonBlook").c'
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/rarities.js',
+            replacement: [
+                {
+                    match: /blacket\.config && blacket\.user && blacket\.rarities/,
+                    replace: 'window?.blacket?.config && window?.blacket?.user && window?.blacket?.rarities'
+                },
+                {
+                    match: /\$\("\#createButtonRarity"\)\.c/,
+                    replace: 'bb.events.dispatch(\'pageInit\');$("#createButtonRarity").c'
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/badges.js',
+            replacement: [
+                {
+                    match: /blacket\.config/,
+                    replace: 'window?.blacket?.config'
+                },
+                {
+                    match: /blacket\.createBadge \=/,
+                    replace: `bb.events.dispatch('pageInit');blacket.createBadge = `
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/banners.js',
+            replacement: [
+                {
+                    match: /blacket\.config && blacket\.banners/,
+                    replace: 'window?.blacket?.config && window?.blacket?.banners'
+                },
+                {
+                    match: /\$\("\#createButtonBanner"\)\.c/,
+                    replace: 'bb.events.dispatch(\'pageInit\');$("#createButtonBanner").c'
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/news.js',
+            replacement: [
+                {
+                    match: /blacket\.user && blacket\.news/,
+                    replace: 'window?.blacket?.user && window?.blacket?.news'
+                },
+                {
+                    match: /localStorage/,
+                    replace: 'bb.events.dispatch(\'pageInit\');localStorage'
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/emojis.js',
+            replacement: [
+                {
+                    match: /blacket\.config/,
+                    replace: 'window?.blacket?.config'
+                },
+                {
+                    match: /blacket.showEditModal =/,
+                    replace: 'bb.events.dispatch(\'pageInit\');blacket.showEditModal ='
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/users.js',
+            replacement: [
+                {
+                    match: /blacket\.user\) \{/,
+                    replace: 'window?.blacket?.user) {'
+                },
+                {
+                    match: /blacket.setUser =/,
+                    replace: 'bb.events.dispatch(\'pageInit\');blacket.setUser ='
+                }
+            ]
+        },
+        {
+            file: '/lib/js/panel/forms.js',
+            replacement: [
+                {
+                    match: /blacket.config/,
+                    replace: 'window?.blacket?.config'
+                },
+                {
+                    match: /blacket.reject =/,
+                    replace: 'bb.events.dispatch(\'pageInit\');blacket.reject ='
                 }
             ]
         }
@@ -510,6 +644,22 @@ export default () => createPlugin({
         }
     `,
     onStart: () => {
+        let mods = {
+            'BetterBlacket v2': () => !!(window.pr || window.addCSS),
+            'Flybird': () => !!window.gold,
+            'Themeify': () => !!document.querySelector('#themifyButton'),
+            'Blacket++': () => !!(window.BPP || window.bpp)
+        };
+
+        if (Object.entries(mods).some((mod) => (mod[1]()) ? true : false)) return document.body.insertAdjacentHTML('beforeend', `
+            <div class="arts__modal___VpEAD-camelCase" id="bigModal">
+                <div class="bb_bigModal">
+                    <div class="bb_bigModalTitle">External Mod Detected</div>
+                    <div class="bb_bigModalDescription" style="padding-bottom: 1vw;">Our automated systems believe you are running the ${mod[0]} mod. We require that only BetterBlacket v3 is running. This prevents unneeded "IP abuse bans" from Blacket's systems.</div>
+                </div>
+            </div>
+        `);
+
         if (!location.pathname.startsWith('/settings')) return;
 
         console.log('Internals started! Patching settings...');

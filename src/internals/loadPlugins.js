@@ -3,6 +3,8 @@ import events from 'utils/events.js';
 import storage from 'utils/storage.js';
 
 export default async () => {
+    console.log('Called loadPlugins()');
+
     let pluginData = storage.get('bb_pluginData', true);
     let contentLoaded = false;
 
@@ -54,6 +56,6 @@ export default async () => {
         });
     });
 
-    console.log('Plugin data loaded. Starting patcher...');
-    patcher();
+    console.log('Done with loadPlugins(), running Patcher.patch()...');
+    patcher.patch();
 }

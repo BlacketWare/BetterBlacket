@@ -2,6 +2,8 @@ import axios from 'axios';
 import storage from 'utils/storage.js';
 
 export default async (single) => {
+    console.log('Called loadThemes()');
+
     bb.themes.list = [];
     bb.themes.broken = [];
 
@@ -47,5 +49,5 @@ export default async (single) => {
     });
 
     if (single) console.log('Reloaded themes.');
-    else console.log('Started loading themes.');
+    else console.log('Finished initial theme load function.');
 };
