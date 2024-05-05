@@ -215,6 +215,10 @@ export default () => createPlugin({
                 {
                     match: /mutation\.type === "childList" \? replace/,
                     replace: 'false ? '
+                },
+                {
+                    match: /if \(window./,
+                    replace: 'if (window.GM_webRequest?.'
                 }
             ]
         },
