@@ -3,6 +3,8 @@ import path from 'path';
 import * as childproc from 'child_process';
 import * as url from 'url';
 
+import version from '#version';
+
 const copyToClip = (data) => {
     let proc = childproc.spawn({
         'darwin': 'pbcopy',
@@ -18,7 +20,9 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const userscriptTemplate = fs.readFileSync(path.resolve(__dirname, 'template.txt'), 'utf-8');
 const bundledCode = fs.readFileSync(path.resolve(__dirname, '../dist/bb.min.js'), 'utf-8');
 
-const userscriptCode = userscriptTemplate.replace('{{code}}', bundledCode);
+const userscriptCode = userscriptTemplate
+    .replace('{{code}}', bundledCode)
+    .replace('{{version}}', version);
 
 fs.writeFileSync(path.resolve(__dirname, '../dist/bb.user.js'), userscriptCode);
 

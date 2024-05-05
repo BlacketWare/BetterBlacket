@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BetterBlacket
 // @description  the best client mod for blacket.
-// @version      3.0.8.3
+// @version      3.0.8.4
 // @icon         https://blacket.org/content/logo.png
 
 // @author       Death / VillainsRule
@@ -2096,8 +2096,6 @@ class Patcher {
     this.observer.disconnect();
     this.patched.forEach(async (script) => {
       try {
-        if (script.includes("?"))
-          script = script.split("?")[0];
         let { data } = await axios.get(script);
         let filePatches = bb.patches.filter((e) => script.replace(location.origin, "").startsWith(e.file));
         for (const patch of filePatches)
