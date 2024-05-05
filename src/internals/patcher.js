@@ -58,6 +58,7 @@ class Patcher {
 
         this.patched.forEach(async (script) => {
             try {
+                if (script.includes('?')) script = script.split('?')[0];
                 let { data } = await axios.get(script);
 
                 let filePatches = bb.patches.filter((e) => script.replace(location.origin, '').startsWith(e.file));
