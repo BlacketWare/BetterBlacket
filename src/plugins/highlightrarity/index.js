@@ -9,8 +9,8 @@ export default () => createPlugin({
             file: '/lib/js/bazaar.js',
             replacement: [
                 {
-                    match: /"\/content\/blooks\/Error\.png"\}" /,
-                    replace: `"/content/blooks/Error.png"}" style="filter: drop-shadow(0 0 7px \${blacket.rarities[blacket.blooks[blook].rarity].color});" `
+                    match: /"\/content\/blooks\/Error\.webp"\}" /,
+                    replace: `"/content/blooks/Error.webp"}" style="filter: drop-shadow(0 0 7px \${blacket.rarities[blacket.blooks[blook].rarity].color});" `
                 },
                 {
                     match: /class="styles__bazaarItemImage___KriA4-camelCase" /,

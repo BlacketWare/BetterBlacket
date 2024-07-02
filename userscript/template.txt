@@ -2,7 +2,7 @@
 // @name         BetterBlacket
 // @description  the best client mod for blacket.
 // @version      {{version}}
-// @icon         https://blacket.org/content/logo.png
+// @icon         https://blacket.org/content/logo.webp
 
 // @author       Death / VillainsRule
 // @namespace    https://bb.villainsrule.xyz

@@ -87,7 +87,7 @@ export default () => createPlugin({
                     blacket.createToast({
                         title: 'Error',
                         message: list.data.reason,
-                        icon: '/content/blooks/Error.png',
+                        icon: '/content/blooks/Error.webp',
                         time: 5000
                     });
                     return blacket.stopLoading();

@@ -35,7 +35,7 @@ export default () => createPlugin({
         ].some(path => location.pathname.startsWith(`/${path}`))) {
             document.querySelector('.styles__topRightRow___dQvxc-camelCase').insertAdjacentHTML('afterbegin', `
                 <div id="tokenBalance" class="styles__tokenBalance___1FHgT-camelCase">
-                    <img loading="lazy" src="/content/tokenIcon.png" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false">
+                    <img loading="lazy" src="/content/tokenIcon.webp" alt="Token" class="styles__tokenBalanceIcon___3MGhs-camelCase" draggable="false">
                     <div>tokens</div>
                 </div>
             `);

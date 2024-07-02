@@ -84,7 +84,7 @@ export default () => createPlugin({
                 },
                 {
                     match: /item.user\).avatar/,
-                    replace: `item.user\)?.avatar || '/content/blooks/Error.png'`
+                    replace: `item.user\)?.avatar || '/content/blooks/Error.webp'`
                 }
             ]
         },
