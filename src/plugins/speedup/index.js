@@ -10,7 +10,7 @@ export default () => createPlugin({
             replacement: [
                 {
                     match: /blacket\.getMessages = async \(room, limit\) => \{/,
-                    replace: `blacket.getMessages = async (room, limit, real = false) => {if (bb.plugins.settings[$self.name]?.['No Load Chat'] && !real) return;`,
+                    replace: `blacket.getMessages = async (room, limit, real = false) => {if (!real) return;`,
                     setting: 'No Load Chat'
                 },
                 {
@@ -21,6 +21,7 @@ export default () => createPlugin({
                 {
                     match: /blacket\.toggleChat = \(\) => \{/,
                     replace: 'blacket.toggleChat = () => {if (!$self.initedChat) blacket.getMessages(blacket.chat.room, 125, true),$self.initedChat = true;',
+                    setting: 'No Load Chat'
                 }
             ]
         },
