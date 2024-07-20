@@ -10,7 +10,6 @@
 // @match        *://blacket.org/*
 // @match        *://blacket.xotic.org/*
 // @match        *://blacket.monkxy.com/*
-// @match        *://blacket.zastix.club/*
 // @match        *://dashboard.iblooket.com/*
 // @match        *://b.blooketis.life/*
 // @match        *://b.fart.services/*

@@ -36,7 +36,7 @@ export default async () => {
         });
     };
 
-    events.subscribe('pageInit', () => {
+    events.listen('pageInit', () => {
         console.log(`Plugins got pageInit. Starting plugins...`);
         bb.plugins.list.forEach((plugin) => {
             if (pluginData.active.includes(plugin.name) || plugin.required) plugin.onStart?.();

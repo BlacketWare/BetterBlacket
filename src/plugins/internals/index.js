@@ -760,7 +760,7 @@ export default () => createPlugin({
             bb.themes.reload();
         };
 
-        bb.events.subscribe('themeUpdate', () => {
+        bb.events.listen('themeUpdate', () => {
             document.querySelector('.bb_themeValidation').innerHTML = `
                 ${bb.themes.list.map(t => `<div class="bb_themeInfo" style="color: green;">${t.name} | ${t.url}</div>`).join('')}
                 ${bb.themes.broken.map(t => `<div class="bb_themeInfo" style="color: red;">${t.url} - ${t.reason}</div>`).join('')}
